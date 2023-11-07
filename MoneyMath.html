@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Calculator</title>
+    <style>
+        .calculator {
+            width: 300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 215px;
+            height: 50px;
+            padding: 10px;
+            font-size: 40px;
+            margin-bottom: 10px;
+            border: 1px solid #000;
+        }
+        .calculator button {
+            width: 70px;
+            height: 70px;
+            font-size: 20px;
+            margin: 5px;
+        }
+        .calculator div {
+            width: 215px;
+            height: 50px;
+            padding: 10px;
+            font-size: 40px;
+            margin-bottom: 10px;
+            border: 1px solid #000;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="score" disabled>
+        <br>
+        <input type="text" id="question" disabled>
+        <input type="text" id="display" disabled>
+        <button onclick="appendToDisplay('7')">7</button>
+        <button onclick="appendToDisplay('8')">8</button>
+        <button onclick="appendToDisplay('9')">9</button>
+        <button onclick="appendToDisplay('4')">4</button>
+        <button onclick="appendToDisplay('5')">5</button>
+        <button onclick="appendToDisplay('6')">6</button>
+        <button onclick="appendToDisplay('1')">1</button>
+        <button onclick="appendToDisplay('2')">2</button>
+        <button onclick="appendToDisplay('3')">3</button>
+        <button onclick="appendToDisplay('0')">0</button>
+        <button onclick="calculateResult()">enter</button>
+        <button onclick="clearDisplay()">clear</button>
+    </div>
+
+    <script>
+        var rightAnswer = -1;
+        function appendToDisplay(value) {
+            document.getElementById('display').value += value;
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        function calculateResult() {
+            var displayValue = document.getElementById('display').value;
+            var result = eval(displayValue);
+            myAnswer = result;
+            check();
+        }
+        
+    const maxDifficulty = 12;
+    var currentDifficulty = 2;
+    var score = 0;
+    var gameOver=false;
+    var question = '';
+    var correctAnswer = -1
+    var myAnswer = -1;
+    function generateQuestion() {
+      var num1 = Math.floor(Math.random() * currentDifficulty) + 1;
+      var num2 = Math.floor(Math.random() * currentDifficulty) + 1;
+      var operator = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+      if(operator=='-'){
+        if(num2>num1){let temp=num2;num2=num1;num1=temp}
+      }
+      question = `${num1} ${operator} ${num2}`;
+      correctAnswer = eval(question)
+      question = question.replace(/\*/g, 'X') + ' =';
+      document.getElementById('question').value = question
+      }
+
+    function resetGame() {
+      currentDifficulty = 2;
+      score = 0;
+      correctAnswer = -1
+      myAnswer = -1
+    }
+    function check(){
+      if(correctAnswer==myAnswer && myAnswer!=undefined && gameOver==false){
+        score++;
+        currentDifficulty = Math.floor(score/20)+2
+        document.getElementById('score').value = 'score: '+score
+        clearDisplay()
+        generateQuestion();
+      }else{
+        if(myAnswer!=undefined  && gameOver==false){
+        score--;
+        currentDifficulty = Math.floor(score/20)+2
+        document.getElementById('score').value = 'score: '+score
+        clearDisplay()
+        generateQuestion();
+        }
+      }
+    }
+    resetGame();
+    generateQuestion();
+    document.getElementById('score').value = 'score: '+score
+    
+    var keysDown = {};
+    addEventListener("keyup",(e)=>{
+      let k = e.keyCode;
+      if(k==48){appendToDisplay('0')}
+      if(k==49){appendToDisplay('1')}
+      if(k==50){appendToDisplay('2')}
+      if(k==51){appendToDisplay('3')}
+      if(k==52){appendToDisplay('4')}
+      if(k==53){appendToDisplay('5')}
+      if(k==54){appendToDisplay('6')}
+      if(k==55){appendToDisplay('7')}
+      if(k==56){appendToDisplay('8')}
+      if(k==57){appendToDisplay('9')}
+      if(k==8){clearDisplay()}
+      if(k==13){calculateResult()}
+    }, false);
+     var seconds = 300;
+     var minutes = 0;
+     function timer(){
+       seconds--;
+       if(seconds==59){seconds=0;minutes++}
+       document.title = seconds+' seconds';
+       if(seconds==0){gameOver=true;alert('GameOver your score was '+score)}
+     }
+     setInterval(timer, 1000);
+    </script>
+</body>
+</html>
