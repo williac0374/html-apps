@@ -28,7 +28,7 @@ canvas {
 <canvas id="canvas"></canvas>
 
 <script>
-palette='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAAXNSR0IArs4c6QAABY5JREFUeF7t3b9K12EcR/Hni0MS+IMGQQoh/zREhBQSQtAF1NLm2BAESnO3EU0NSTQ2NXcTgS6RmwhFkoMSTkV2GWd5eQMfkffhPOe7OI0xLkf4s3pzM7w+xtr8fHp/5dpFev/28tX0/tMbv9L7EwAAUC4QAAxQ7m8wgCdQOkBPIE+gdIAaQAOI4BBBBmCAcH6+AmkADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyACxAQ4/vEifQItr7f8HWNjYSwF4//t6ev/g8Ci9/+Xro/T+BAAAlAsEAAOU+xsM4AmUDtATyBMoHaAG0AAiOESQARggnN8YDMAADBAiyAAMEM6PAXwF8hUoBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABYgM82dlIAbhyfBHOb4yj88X0/sLcw/T++cosvX9n9iy9PwEAAOUCAcAA5f4GA3gCpQP0BPIESgeoATSACA4RZAAGCOfnK5AG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAwQG+D5u8v0CfT3/vd0gC9nS+n9zfW59P7ep8/p/ZOD/fT+BAAAlAsEAAOU+xsM4AmUDtATyBMoHaAG0AAiOESQARggnN8YDMAADBAiyAAMEM6PAXwF8hUoBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABYgPs7O6mAJyd/gznN8by6VZ6/8HZx/T+3Vv30vv/1rfT+xMAAFAuEAAMUO5vMIAnUDpATyBPoHSAGkADiOAQQQZggHB+vgJpAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgAsQFev32cPoH+fPuRDvDVm/0p/QUcT/8CEwAAkC4wPg4ABogn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbX/wOphD47uK8IPAAAAABJRU5ErkJgggAA'
+
 canvas.width=200;
 canvas.height=200;
 setup = false
@@ -72,9 +72,9 @@ if(!setup){
   function button6(){alert('I am button6')}
     make_button(x+=xMod,0,xMod,yMod,0,[255,255,255],[0,0,0],[66,66,66],'button7',4,[],button6);
   function button7(){alert('I am button7')}
-    make_button(x+=xMod,0,xMod,yMod,0,[255,255,255],[0,0,0],[66,66,66],'button8',4,[],button7);
+    make_button(x+=xMod,0,xMod,yMod,0,[255,255,255],[0,0,0],[66,66,66],'clear',4,[],clear);
   function button8(){alert('I am button8')}
-    make_button(x+=xMod,0,xMod,yMod,0,[255,255,255],[0,0,0],[66,66,66],'button9',4,[],button9);
+    make_button(x+=xMod,0,xMod,yMod,0,[255,255,255],[0,0,0],[66,66,66],'copy up',4,[],copy_up);
   function button9(){alert('I am button9')}
     make_button(x+=xMod,0,xMod,yMod,0,[255,255,255],[0,0,0],[66,66,66],'animation',4,[],setMode);
   function button10(){alert('I am button10')}
@@ -85,16 +85,17 @@ if(!setup){
     y = yMod;
     xMod = window.innerWidth/100*15;
     yMod = window.innerHeight/25;
-    function pickPaletteColor(){
-      
-      if(mouse_check_pressed()){
-        project.color=getPixelColor(mouse_x, mouse_y)
-      }
-    }
+  function pickPaletteColor(){if(mouse_check_pressed()){project.color=getPixelColor(mouse_x, mouse_y);}}
     make_button(x,y,xMod,xMod,0,[255,255,255],[0,0,0],[66,66,66],'palette',4,[],pickPaletteColor);
-  make_button(x,y+=xMod,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'pencil',4,[],function(){});
-  make_button(x+=xMod/3,y,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'bucket',4,[],function(){});
-  make_button(x+=xMod/3,y,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'line',4,[],function(){});
+    function set_tool(ob){
+    if(ob.text=='pencil'){project.tool=0}
+    if(ob.text=='bucket'){project.tool=1}
+    if(ob.text=='line'){project.tool=2}
+      
+    }
+    make_button(x,y+=xMod,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'pencil',4,[],set_tool);
+    make_button(x+=xMod/3,y,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'bucket',4,[],set_tool);
+    make_button(x+=xMod/3,y,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'line',4,[],set_tool);
     x=0;
   make_button(x,y+=xMod/3,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'pencil',4,[],function(){});
   make_button(x+=xMod/3,y,xMod/3,xMod/3,0,[255,255,255],[0,0,0],[66,66,66],'bucket',4,[],function(){});
@@ -109,6 +110,7 @@ if(!setup){
       y:window.innerHeight/15+4,
       width:32,
       height:32,
+      tool:0,
       layers:[],
       mode:'animation',
       currentLayer:0,
@@ -188,11 +190,15 @@ if(!setup){
             }
           }
         }
-        draw_set_color(255,255,255);
+        let r = parseInt(this.color[0])
+        let g = parseInt(this.color[1])
+        let b = parseInt(this.color[2])
+        
+        draw_set_color(r,g,b);
         this.cX = snap(mouse_x-this.x-this.offX,this.gridSize);
         this.cY = snap(mouse_y-this.y-this.offY,this.gridSize)
         draw_set_linewidth(3)
-        draw_rectangle(this.x+this.cX+this.offX, this.y+this.cY+this.offY, this.gridSize, this.gridSize,true,0,0,0);
+        draw_rectangle(this.x+this.cX+this.offX, this.y+this.cY+this.offY, this.gridSize, this.gridSize,false,0,0,0);
         draw_set_color(255,0,0);
         let cWc = (containerL+(containerR-containerL)/2)+4;
         let cHc = (containerT+(containerB-containerT)/2)+4;
@@ -200,6 +206,7 @@ if(!setup){
         draw_line(cWc, 0, cWc, containerB)
       },
       loop:function(){
+        document.title='FPS:  '+fps
         if(inside(mouse_x, mouse_y, this.x+this.offX, this.y+this.offY, this.width*this.gridSize, this.height*this.gridSize, 0, 0, 0)){
           this.gridSize+=wheelDir;
           wheelDir=0;
@@ -211,14 +218,38 @@ if(!setup){
           cellX = clamp(cellX, 0, this.width);
           cellY = clamp(cellY, 0, this.height);
           if(mouse_check()){
-          if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ this.layers[project.currentLayer][cellX][cellY] = this.color}
+         
+            if(this.tool==0){
+            if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ this.layers[project.currentLayer][cellX][cellY] = this.color}
+            }
+                        if(this.tool==1){
+            if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ paintFill(cellX, cellY, this.color);}
+            }
+                        if(this.tool==2){
+            if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ paintFill(cellX, cellY, this.color);}
+                         }
           }
+          
           if( mouse_right_down){
-          if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ this.layers[project.currentLayer][cellX][cellY] = [-1,-1,-1]}
+            if(this.tool==0){
+            if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ this.layers[project.currentLayer][cellX][cellY] = [-1,-1,-1]}
+            }
+                        if(this.tool==1){
+            if(this.layers[project.currentLayer][cellX][cellY]!=undefined){paintFill(cellX, cellY, [-1,-1,-1]);}
+            }
+                        if(this.tool==2){
+            if(this.layers[project.currentLayer][cellX][cellY]!=undefined){ this.layers[project.currentLayer][cellX][cellY] = [-1,-1,-1]}
+            }
           }
           
         }
         this.preview();
+        
+        
+        // button hiliter code
+      if(this.tool==0){buttons[11].hilite=true;buttons[12].hilite=false;buttons[13].hilite=false}
+      if(this.tool==1){buttons[12].hilite=true;buttons[11].hilite=false;buttons[13].hilite=false}
+      if(this.tool==2){buttons[13].hilite=true;buttons[11].hilite=false;buttons[12].hilite=false}
       },
       preview:function(){
         if (this.mode == 'spriteStacking') {
@@ -271,8 +302,6 @@ if(!setup){
             this.previewTick=0;
             this.previewFrame++
           }
-          
-          document.title = this.previewFrame
         if(this.previewFrame==this.layerMax){this.previewFrame=0}
           for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
@@ -292,8 +321,8 @@ if(!setup){
     }
     
     if(localStorage.getItem('smoke_stack')==null){
-    project.init(16);
-   project.palette=draw_set_image('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAAXNSR0IArs4c6QAABY5JREFUeF7t3b9K12EcR/Hni0MS+IMGQQoh/zREhBQSQtAF1NLm2BAESnO3EU0NSTQ2NXcTgS6RmwhFkoMSTkV2GWd5eQMfkffhPOe7OI0xLkf4s3pzM7w+xtr8fHp/5dpFev/28tX0/tMbv9L7EwAAUC4QAAxQ7m8wgCdQOkBPIE+gdIAaQAOI4BBBBmCAcH6+AmkADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyACxAQ4/vEifQItr7f8HWNjYSwF4//t6ev/g8Ci9/+Xro/T+BAAAlAsEAAOU+xsM4AmUDtATyBMoHaAG0AAiOESQARggnN8YDMAADBAiyAAMEM6PAXwF8hUoBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABYgM82dlIAbhyfBHOb4yj88X0/sLcw/T++cosvX9n9iy9PwEAAOUCAcAA5f4GA3gCpQP0BPIESgeoATSACA4RZAAGCOfnK5AG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAwQG+D5u8v0CfT3/vd0gC9nS+n9zfW59P7ep8/p/ZOD/fT+BAAAlAsEAAOU+xsM4AmUDtATyBMoHaAG0AAiOESQARggnN8YDMAADBAiyAAMEM6PAXwF8hUoBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABYgPs7O6mAJyd/gznN8by6VZ6/8HZx/T+3Vv30vv/1rfT+xMAAFAuEAAMUO5vMIAnUDpATyBPoHSAGkADiOAQQQZggHB+vgJpAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgAsQFev32cPoH+fPuRDvDVm/0p/QUcT/8CEwAAkC4wPg4ABogn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbX/wOphD47uK8IPAAAAABJRU5ErkJgggAA')
+      project.init(16);
+      project.palette=draw_set_image('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAAXNSR0IArs4c6QAABY5JREFUeF7t3b9K12EcR/Hni0MS+IMGQQoh/zREhBQSQtAF1NLm2BAESnO3EU0NSTQ2NXcTgS6RmwhFkoMSTkV2GWd5eQMfkffhPOe7OI0xLkf4s3pzM7w+xtr8fHp/5dpFev/28tX0/tMbv9L7EwAAUC4QAAxQ7m8wgCdQOkBPIE+gdIAaQAOI4BBBBmCAcH6+AmkADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyAAMkA5QA2gADRAiyAAMEM5PA2gADZACyACxAQ4/vEifQItr7f8HWNjYSwF4//t6ev/g8Ci9/+Xro/T+BAAAlAsEAAOU+xsM4AmUDtATyBMoHaAG0AAiOESQARggnN8YDMAADBAiyAAMEM6PAXwF8hUoBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABYgM82dlIAbhyfBHOb4yj88X0/sLcw/T++cosvX9n9iy9PwEAAOUCAcAA5f4GA3gCpQP0BPIESgeoATSACA4RZAAGCOfnK5AG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAzAAOkANYAG0AAhggzAAOH8NIAG0AApgAwQG+D5u8v0CfT3/vd0gC9nS+n9zfW59P7ep8/p/ZOD/fT+BAAAlAsEAAOU+xsM4AmUDtATyBMoHaAG0AAiOESQARggnN8YDMAADBAiyAAMEM6PAXwF8hUoBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABGCCcnwbQABogBZABGCAdoAbQABogRJABYgPs7O6mAJyd/gznN8by6VZ6/8HZx/T+3Vv30vv/1rfT+xMAAFAuEAAMUO5vMIAnUDpATyBPoHSAGkADiOAQQQZggHB+vgJpAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgADJAOUANoAA0QIsgADBDOTwNoAA2QAsgAsQFev32cPoH+fPuRDvDVm/0p/QUcT/8CEwAAkC4wPg4ABogn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbXAQCAeILteQAAoF1gfB0AAIgn2J4HAADaBcbX/wOphD47uK8IPAAAAABJRU5ErkJgggAA')
     }else{
       let data = JSON.parse(localStorage.getItem('smoke_stack'))
       project.init(data.size);
@@ -315,6 +344,7 @@ if(!setup){
       loop:function(){
         if(inside(mouse_x, mouse_y, this.x, this.y, this.w, this.h, 0, 0, 0)){
           if(wheelDir!=0){
+            backup();
             project.currentLayer+=wheelDir;
             project.currentLayer = clamp(project.currentLayer,0,project.layerMax-1)
             wheelDir=0
@@ -353,14 +383,32 @@ window.onresize = function(event) {
   resize()
 };
 function back_up(){
-  let data={};
+let data={};
   data.palette = project.palette.src
   data.size = project.width;
   data.layers = project.layers;
   localStorage.setItem('smoke_stack',JSON.stringify(data))
 }
-  
-
+function copy_up(){
+  if(project.currentLayer<project.layerMax-1){
+    project.layers[project.currentLayer+1] = JSON.parse(JSON.stringify(project.layers[project.currentLayer]))
+    project.currentLayer++;
+  }
+}
+function clear(){
+  for (let y = 0; y < project.height; y++) {
+    for (let x = 0; x < project.width; x++) {
+      project.layers[project.currentLayer][x][y] = [-1, -1, -1];
+    }
+  }
+}
+function ins(ob){
+  if(inside(mouse_x, mouse_y, ob.x, ob.y, ob.w, ob.h, 0, 0, 0)){
+    return true
+  }else{
+    return false
+  }
+}
 function getPixelColor(x, y) {
   const imageData = ctx.getImageData(x, y, 1, 1);
   const [r, g, b] = imageData.data; // Extract RGB values
@@ -394,6 +442,7 @@ function start(){
   if(setup){
     
   }
+  hilite=draw_set_image('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAAAwCAYAAADZ9HK+AAAAAXNSR0IArs4c6QAAASlJREFUeF7tnKERAzEQxOxOAlPGl54yAtNJ8hNsIKzT4yXa1fwc8n6+Ht/VN7aBnQBjt/+DJ8Ds/RNg+P4JkACHI/B9ffb0Yoz8p3vveAMkgHH+tRLAuSumSgBclTOYAM5dMVUC4KqcwQRw7oqpEgBX5QwmgHNXTJUAuCpnMAGcu2KqBMBVOYMJ4NwVUyUArsoZTADnrpgqAXBVzmACOHfFVAmAq3IGE8C5K6ZKAFyVM5gAzl0xVQLgqpzBBHDuiqkSAFflDCaAc1dMlQC4KmcwAZy7YqoEwFU5gwng3BVTJQCuyhlMAOeumCoBcFXOYAI4d8VUCYCrcgYTwLkrpkoAXJUzmADOXTFVAuCqnEEsgBM/qlMDvRQ63IsESIBeC5/sQH+Ayevf7D/+cfmBdmLV8wAAAABJRU5ErkJggg==')
 }
 
 function loop(){
@@ -441,7 +490,100 @@ function draw(){
 function drawRoundedRectangle(x, y, width, height, radius, backColor, borderColor, borderThickness, borderDashStyle) {if (radius > Math.min(width, height) / 2) {radius = Math.min(width, height) / 2;}draw_set_linedash(borderDashStyle);draw_set_linewidth(borderThickness);ctx.fillStyle = "rgb("+backColor[0]+","+backColor[1]+","+backColor[2]+")";ctx.strokeStyle = "rgb("+borderColor[0]+","+borderColor[1]+","+borderColor[2]+")";ctx.beginPath();ctx.moveTo(x + radius, y);ctx.lineTo(x + width - radius, y);ctx.arcTo(x + width, y, x + width, y + radius, radius);ctx.lineTo(x + width, y + height - radius);ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);ctx.lineTo(x + radius, y + height);ctx.arcTo(x, y + height, x, y + height - radius, radius);ctx.lineTo(x, y + radius);ctx.arcTo(x, y, x + radius, y, radius);ctx.closePath();ctx.fill();ctx.stroke();draw_set_linedash([]);}
 
 
-function make_button(x,y,w,h,rad,bacC,borC,txtC,text,bW,bD,onclick,sprite){let temp={x:x,y:y,w:w,h:h,rad:rad,hover:false,textCol:txtC,backCol:bacC,borderCol:borC,text:text,onclick:onclick,draw:function(){if(this.hover){drawRoundedRectangle(this.x, this.y, this.w, this.h,this.rad,[111,111,111], this.borderCol, bW, bD);}else{drawRoundedRectangle(this.x, this.y, this.w, this.h,this.rad, this.backCol, this.borderCol, bW, bD);}if(sprite!=null){draw_image(sprite,this.x, this.y, this.w, this.h)}let tSize = text_fit(this.text,this.w)*0.7;draw_set_color(this.textCol[0],this.textCol[1],this.textCol[2]);draw_centered_text(this.x+this.w/2, this.y+this.h/2, this.text, tSize, 700);},loop:function(){if(inside(mouse_x, mouse_y, this.x, this.y, this.w, this.h, 0, 0, 0)){this.hover=true;if(mouse_check_pressed()){this.onclick();mouse_down = false;mouse_pressed = false;}}else{this.hover=false;}},};buttons.push(temp);}
+function make_button(x,y,w,h,rad,bacC,borC,txtC,text,bW,bD,onclick){
+  let temp={
+    x:x,y:y,w:w,h:h,rad:rad,bW:bW,bD:bD,hilite:false,hover:false,textCol:txtC,backCol:bacC,borderCol:borC,text:text,onclick:onclick,draw:function(){
+      if(this.hover){
+        if (this.hilite){
+          drawRoundedRectangle(this.x+this.bW/2, this.y+this.bW/2, this.w-this.bW*2, this.h-this.bW*2,this.rad,[111,111,111], [0,255,0], this.bW, this.bD);
+        }
+        else{
+          drawRoundedRectangle(this.x, this.y, this.w, this.h,this.rad,[111,111,111], this.borderCol, this.bW, this.bD);
+        }
+      }
+      else{
+        if (this.hilite){
+          drawRoundedRectangle(this.x+this.bW/2, this.y+this.bW/2, this.w-this.bW*2, this.h-this.bW*2,this.rad, this.backCol,  [0,255,0], this.bW, this.bD);
+        }
+        else{
+          drawRoundedRectangle(this.x, this.y, this.w, this.h,this.rad, this.backCol, this.borderCol, bW, bD);
+        }
+      }
+      let tSize = text_fit(this.text,this.w)*0.5;
+      draw_set_color(this.textCol[0],this.textCol[1],this.textCol[2]);
+      draw_centered_text(this.x+this.w/2, this.y+this.h/2, this.text, tSize, 700);
+    }
+    ,loop:function(){
+      if(inside(mouse_x, mouse_y, this.x, this.y, this.w, this.h, 0, 0, 0)){
+        this.hover=true;
+        if(mouse_check_pressed()){
+          this.onclick(this);
+          mouse_down = false;
+          mouse_pressed = false;
+        }
+      }
+      else{
+        this.hover=false;
+      }
+    }
+  ,}
+  ;
+  buttons.push(temp);
+}
+
+function paintFill(startX, startY, fillColor) {
+  let layer = project.layers[project.currentLayer];
+
+  // Get the color at the starting point
+  const targetColor = layer[startX][startY];
+
+  // If the target color is the same as the fill color, do nothing
+  if (
+    targetColor[0] === fillColor[0] &&
+    targetColor[1] === fillColor[1] &&
+    targetColor[2] === fillColor[2]
+  ) {
+    return;
+  }
+
+  // Helper function to check if a cell is within bounds and matches the target color
+  function isValid(x, y) {
+    return (
+      x >= 0 &&
+      x < project.width &&
+      y >= 0 &&
+      y < project.height &&
+      layer[x][y][0] === targetColor[0] &&
+      layer[x][y][1] === targetColor[1] &&
+      layer[x][y][2] === targetColor[2]
+    );
+  }
+
+  // Use a stack for the flood fill
+  let stack = [[startX, startY]];
+
+  while (stack.length > 0) {
+    const [x, y] = stack.pop();
+
+    // Move to the leftmost pixel in the current row
+    let left = x;
+    while (isValid(left - 1, y)) left--;
+
+    // Move to the rightmost pixel in the current row
+    let right = x;
+    while (isValid(right + 1, y)) right++;
+
+    // Fill the entire row between left and right
+    for (let i = left; i <= right; i++) {
+      layer[i][y] = [...fillColor];
+
+      // Check the row above and below for connected areas
+      if (isValid(i, y - 1)) stack.push([i, y - 1]);
+      if (isValid(i, y + 1)) stack.push([i, y + 1]);
+    }
+  }
+}
+
 
 
 
