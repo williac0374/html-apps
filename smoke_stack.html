@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>smoke stack</title>
+<style>
+:root {
+  --blue: #1e90ff;
+  --white: #ffffff;
+}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f0f0f0;
+}
+#menu_panel {
+  position: absolute;
+  left:0vw;
+  top:0vh;
+  height: 7vh;
+  width: 100vw;
+  background-color:  var(--blue);
+  color: #1EFF00;
+  display: flex;
+}
+#menu_panel button {
+  background-color:  var(--blue);
+  color: var(--white);
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+#menu_panel button:hover {
+  background-color:  var(--white);
+  color: #151515;
+}
+#left_panel{
+  position: absolute;
+  left:0vw;
+  top:7vh;
+  width: 20vw;
+  height: 93vh;
+  background-color: blue;
+}
+#palette_panel{
+  left:0%;
+  top:0%;
+  width: 100%;
+  height: 25%;
+  background-color: orange;
+}
+#palette_panel canvas{
+  position: absolute;
+  left:1%;
+  top: 1%;
+  width: 98%;
+  height: 23%;
+  background-color: purple;
+}
+#current_layer{
+  position: absolute;
+  left:20vw;
+  top:7vh;
+  width: 93vh;
+  height: 93vh;
+  background-color: #000000;
+}
+#current_layer canvas{
+  position: absolute;
+  left:1%;
+  top: 1%;
+  width: 98%;
+  height: 98%;
+  background-color: #66ff66;
+}
+#right_panel{
+  position: absolute;
+  left:80vw;
+  top:7vh;
+  width: 20vw;
+  height: 93vh;
+  background-color: purple;
+}
+</style>
+</head>
+<body>
+<div id='menu_panel'>
+<button id="new_stack">new_stack</button>
+<button id="new_palette">new_palette</button>
+<button id="test">TEST!</button>
+</div>
+<div id='left_panel'>
+<div id='palette_panel'>
+<canvas id="palette_panel_canvas"></canvas>
+</div>
+</div>
+<div id='right_panel'></div>
+<div id='current_layer'>
+<canvas id="current_layer_canvas"></canvas>
+</div>
+<script>
+spriteWidth = 32;
+data = []
+for (let y = 0; y < spriteWidth; y++) {
+  var row = [];
+  for (let x = 0; x < spriteWidth; x++) {
+    row.push(null);
+  }
+  data.push(row);
+};
+color = '#ffffff'
+mLeft=false;
+Ppanel = document.getElementById("palette_panel");
+Rpanel = document.getElementById("right_panel");
+Pcanvas = document.getElementById("palette_panel_canvas");
+Pctx = Pcanvas.getContext("2d");
+cLay = document.getElementById("current_layer");
+Rpanel.style.left = cLay.getBoundingClientRect().right+'px'
+Rpanel.style.width = (window.innerWidth-cLay.getBoundingClientRect().right)+'px'
+cLcanvas = document.getElementById("current_layer_canvas");
+cLctx = cLcanvas.getContext("2d");
+cLcanvas.width=cLcanvas.getBoundingClientRect().width
+cLcanvas.height=cLcanvas.getBoundingClientRect().height
+let palette = new Image();
+palette.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAACACAMAAADTa0c4AAADAFBMVEUAAAAiIDRFKDxmOTGPVjvfcSbZoGbuw5r78jaZ5VBqvjA3lG5LaS9SSyQyPDk/P3QwYIJbbuFjm/9fzeTL2/z///+brbeEfodpampZVlJ2QoqsMjLZV2PXe7qPl0qKbzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQfngCAAAAwUlEQVR42uzaoQ0AMAhFQWgquv/EHQH/uWdBXYKja6jD56eWBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANtRvWgifOwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCg6z/ACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgPj8BzgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQ3wcAAP//AwDmDQE3Ixu6CAAAAABJRU5ErkJggg==';
+palette.loaded=false;
+tick=0
+palette.onload = function () {
+  Pctx.drawImage(palette, 0, 0, Pcanvas.width, Pcanvas.height);
+setInterval(function(){main()},100)
+};
+function main(){
+  // for random stuff to do
+  
+}
+
+////////////////////////////////////////////////////////////////////
+// INPUT HANDLING
+////////////////////////////////////////////////////////////////////
+document.addEventListener('keydown', function(event) {
+  //event.key event.keyCode
+if(event.key=='Escape'){window.close()}
+});
+document.addEventListener('keyup', function(event) {
+  //event.key event.keyCode
+});
+addEventListener('mousemove', function(event) {
+  let mx, my;
+  // Otherwise use mouse input
+  if (event.pageX != undefined && event.pageY != undefined) {
+    mx = event.pageX;
+    my = event.pageY;
+  } else {
+    mx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+    my = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+  }
+  ////////color picker code
+  
+  var rect = Pcanvas.getBoundingClientRect();
+  //checks if its over the palette for color picking
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+    var scaleX = Pcanvas.width / rect.width;  // Scale factor for X
+    var scaleY = Pcanvas.height / rect.height; // Scale factor for Y
+    var adjustedX = (mx - rect.left) * scaleX;
+    var adjustedY = (my - rect.top) * scaleY;
+    const eyeDropper = getPixelColor(adjustedX, adjustedY);
+  if(mLeft){color = eyeDropper}
+  }
+  //////////////////////////////////////////////////////////
+  // clears cLcanvas
+  cLctx.clearRect(0, 0, cLcanvas.width, cLcanvas.height);
+  //draws layer grid
+  let gs = cLcanvas.getBoundingClientRect().height/spriteWidth
+  drawGrid(cLctx,gs)
+  ///////////////////////////////////////////////////////
+  //data[] setting code
+  rect = cLcanvas.getBoundingClientRect();
+  scaleX = cLcanvas.width / rect.width;  // Scale factor for X
+  scaleY = cLcanvas.height / rect.height; // Scale factor for Y
+  adjustedX = (mx - rect.left) * scaleX;
+  adjustedY = (my - rect.top) * scaleY;
+  // snaps into place according to grid overlay
+  let cx = Math.round(adjustedX/gs)*gs
+  let cy = Math.round(adjustedY/gs)*gs
+  let cellX = cx/gs
+  let cellY = cy/gs
+  document.title=color
+  // assigns data colors according to cellX and cellY if left mouse button is down.
+  if(mLeft){data[cellY][cellX]=color}
+  // goes thru and draws current layer data values to cLcanvas.
+  for (let y = 0; y < spriteWidth; y++) {
+    for (let x = 0; x < spriteWidth; x++) {
+      if(data[y][x]!=null){
+        cLctx.fillStyle = data[y][x];
+        cLctx.fillRect(x*gs,y*gs,gs,gs)
+      }
+    }
+  }
+  // draws cursor box on cLcanvas
+  cLctx.fillStyle = color;
+  cLctx.fillRect(cx,cy,gs,gs)
+});
+document.addEventListener('mousedown', function(event) {
+if(event.button==0){mLeft=true}
+  // event.button  0 left 1 middle 2 right
+});
+document.addEventListener('mouseup', function(event) {
+if(event.button==0){mLeft=false}
+  // event.button  0 left 1 middle 2 right
+});
+window.addEventListener('contextmenu', function(event) {event.preventDefault()});
+document.addEventListener('wheel', function(event) {
+  //event.deltaY >0 down <0 up
+});
+function getPixelColor(x, y) {
+  const imageData = Pctx.getImageData(x, y, 1, 1);
+  const [r, g, b] = imageData.data; // Extract RGB values
+  return rgbToHex(r, g, b);
+}
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+function drawGrid(ctx,gridSize){
+  let wide = ctx.canvas.getBoundingClientRect().width
+  let tall = ctx.canvas.getBoundingClientRect().height
+  ctx.strokeStyle = "white";ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(let x = 0; x<=spriteWidth*gridSize; x+=gridSize){
+    
+    ctx.moveTo( x, 0);
+    ctx.lineTo( x, ctx.canvas.height);
+  }
+  for(let y = 0; y<=spriteWidth*gridSize; y+=gridSize){
+    ctx.moveTo( 0, y);
+    ctx.lineTo( spriteWidth*gridSize, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+  
+}
+</script>
+</body>
+</html>
