@@ -94,8 +94,8 @@ body {
   left:1%;
   top: 1%;
   width: 98%;
-  height: 24%;
-  font-size: 44px;
+  height: 7%;
+  font-size: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,10 +104,10 @@ body {
 #layer_control{
   position: absolute;
   left:1%;
-  top: 25%;
+  top: 8%;
   width: 98%;
-  height: 24%;
-  font-size: 44px;
+  height: 7%;
+  font-size: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -115,17 +115,19 @@ body {
 }
 #right_panel canvas{
   position: absolute;
-  left:25%;
-  top: 50%;
-  width: 50%;
-  height: 48%;
+  left:5%;
+  top: 18%;
+  width: 80%;
+  height: 80%;
   background-color: #003322;
 }
+
+
 </style>
 </head>
 <body>
 <div id='menu_panel'>
-<button id="new_stack">new_stack</button>
+<button id="new_stack"onclick='reset(parseInt(prompt("sprite size?")))'>new_stack</button>
 <button id="new_palette">new_palette</button>
 <button id="mode" onclick='if(mode=="stack"){mode="animate";layer=0;this.innerText="animate"}else{mode="stack";this.innerText="stack"};mLeft=false;'>animate!</button>
 </div>
@@ -166,23 +168,27 @@ function data_clear(sw){
     data.push(row);
   };
 }
-spriteWidth = 32;
-data_clear(spriteWidth)
-color = '#ffffff'
-mx = 0;
-my = 0;
-cx=0;
-cy=0;
-previewScale = 2
-cellX = 0;
-cellY = 0;
-mLeft=false;
-mRight=false;
-gs=0;
-layers = []
-layer=0;
-keys=[];
-layers.push(JSON.parse(JSON.stringify(data)))
+function reset(sw){
+  spriteWidth = sw;
+  data_clear(spriteWidth)
+  color = '#ffffff'
+  mx = 0;
+  my = 0;
+  cx=0;
+  cy=0;
+  previewScale = 2
+  cellX = 0;
+  cellY = 0;
+  mLeft=false;
+  mRight=false;
+  gs=0;
+  layers = []
+  layerCanvases=[]
+  layer=0;
+  keys=[];
+  make_layer(data)
+}
+reset(12)
 cLayer = document.getElementById("layer_control");
 lDisplay = document.getElementById("layer_display");
 lDisplay.innerText='hello world'
@@ -210,7 +216,6 @@ palette.loaded=false;
 tick=0
 animSpeed=500
 stackOffset = 10
-stackScale = 2
 anim8 = false;
 mode='animate'
 palette.onload = function () {
@@ -235,10 +240,9 @@ function animate(){
 if(mode=='stack'){speed=animSpeed*0.01}
 if(anim8){setTimeout(function(){animate()},speed)}
 }
- frameCount = 0; // To track the number of frames
- lastTime = performance.now(); // Initial time for the FPS calculation
- fps = 0; // Current FPS value
-
+frameCount = 0; // To track the number of frames
+lastTime = performance.now(); // Initial time for the FPS calculation
+fps = 0; // Current FPS value
 function calculateFPS() {
   const now = performance.now(); // Get the current time
   frameCount++; // Increment the frame count
@@ -260,7 +264,7 @@ function main(){
     keys[16]=false;
     keys[51]=false;
     if(confirm('make new layer?')){
-      layers.push(blank(spriteWidth))
+      make_layer()
     }
   }
   rect = cLcanvas.getBoundingClientRect();
@@ -287,17 +291,18 @@ function main(){
   if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
     if(mLeft){
       if(confirm('make new layer?')){
-        layers.push(blank(spriteWidth))
+        make_layer()
       }
       mLeft=false;
     }
   }
-   calculateFPS();
-  document.title='FPS : '+fps
+  calculateFPS()
+  document.title='FPS: '+fps
   requestAnimationFrame(main);
 }
 function copy_data(){
   layers[layer]=JSON.parse(JSON.stringify(data))
+  updateLayerCanvas(layer)
 }
 ////////////////////////////////////////////////////////////////////
 // INPUT HANDLING
@@ -318,6 +323,7 @@ if(event.key=='p'){paintFill(cellY, cellX, color);draw_data(data);copy_data();da
   keys[event.keyCode]=true
 if(event.key=='e'){if(confirm('export sprite strip?')){export_sprite_strip()}}
 if(event.key=='u'){copy_up()}
+if(event.key=='o'){if(oFFcanvas.style.display=='none'){oFFcanvas.style.display='block'}else{oFFcanvas.style.display='none'}}
 if(event.key=='a'){if(anim8){anim8=false}else{anim8=true;animate()}}
 if(event.key=='m') {if(mode=="stack"){mode="animate";layer=0;this.innerText="animate"}else{mode="stack";this.innerText="stack"};mLeft=false;}
   //alert(event.key)
@@ -386,13 +392,13 @@ if(event.deltaY<0){wheel=-1}
   var rect = Prevcanvas.getBoundingClientRect();
   //checks if its over the preview for scale adjustment
   if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
-    previewScale+=wheel
+  if(!keys[89]){previewScale+=wheel}
   if(previewScale<1){previewScale=1}
     if(mode=='animate'){
       data_2_canvas(Prectx,layers[layer],previewScale)
     }
     if(mode=='stack'){
-    if(keys[89]){stackOffset+=wheel}
+    if(keys[89]){stackOffset+=wheel} // y key
       
     }
     
@@ -473,13 +479,15 @@ function copy_up(){
     data_2_canvas(Prectx,layers[layer],previewScale)
     data_clear(spriteWidth)
     data=JSON.parse(JSON.stringify(layers[layer]))
+    updateLayerCanvas(layer)
     draw_data(data);
   }else{ // youll have to create a new layer to copy up to.
-    layers.push(JSON.parse(JSON.stringify(layers[layer])))
+    make_layer(layers[layer])
     layer++
     data_2_canvas(Prectx,layers[layer],previewScale)
     data_clear(spriteWidth)
     data=JSON.parse(JSON.stringify(layers[layer]))
+    updateLayerCanvas(layer)
     draw_data(data);
     
   }
@@ -546,40 +554,49 @@ function draw_data(_data){
   }
 }
 
+
+// Draw the stack using pre-rendered canvases
 function draw_stack(rot,yoffset) {
   const canvasWidth = oFFcanvas.width;
   const canvasHeight = oFFcanvas.height;
-  const stackOffset = yoffset; // Vertical offset between layers.
+  const stackOffset = yoffset; // Vertical offset between layers
   const centerX = canvasWidth / 2;
   const centerY = canvasHeight / 2;
-  const rotationAngle = (Math.PI / 180) * rot; // Example rotation angle for all layers.
+  const rotationAngle = (Math.PI / 180) * rot; // Example rotation angle
   
-  // Clear the offscreen canvas
+  // Clear the preview canvas
   oFFctx.clearRect(0, 0, canvasWidth, canvasHeight);
   
-  layers.forEach((layerData, index) => {
-    const yOffset = index * stackOffset; // Incremental height offset.
+  layerCanvases.forEach((layerCanvas, index) => {
+    const yOffset = index * stackOffset;
     
     // Save the current context state
     oFFctx.save();
     
-    // Translate to the canvas center, apply the offset, and rotate
+    // Translate and rotate
     oFFctx.translate(centerX, centerY - yOffset);
     oFFctx.rotate(rotationAngle);
     
-    // Draw the layer (centered)
-    drawLayerToContext(oFFctx, layerData);
+    let ox = layerCanvas.width*previewScale / 2;
+    let oy = layerCanvas.height*previewScale / 2
+    // Draw the pre-rendered canvas
+    oFFctx.drawImage(
+    layerCanvas,
+    -ox,
+    -oy,
+    layerCanvas.width*previewScale,
+    layerCanvas.height*previewScale
+    );
     
-    // Restore the context for the next layer
+    // Restore context for the next layer
     oFFctx.restore();
   });
   Prectx.clearRect(0, 0, Prectx.canvas.width, Prectx.canvas.height);
   Prectx.drawImage(oFFctx.canvas, 0, 0, Prectx.canvas.width, Prectx.canvas.height);
 }
-
 // Helper function to draw a single layer
 function drawLayerToContext(ctx, data) {
-  const scale = stackScale; // Scale for the size of each layer.
+  const scale = 10; // Scale for the size of each layer.
   const halfWidth = (spriteWidth * scale) / 2;
   
   for (let y = 0; y < spriteWidth; y++) {
@@ -622,25 +639,25 @@ function export_sprite_strip() {
   const spriteHeight = spriteWidth; // Height of each layer
   const spriteWidthPixels = spriteWidth; // Width of each layer
   const stripWidth = spriteWidthPixels * layers.length; // Total width of the sprite strip
-
+  
   // Create a temporary canvas for the sprite strip
   const exportCanvas = document.createElement("canvas");
   exportCanvas.width = stripWidth;
   exportCanvas.height = spriteHeight;
   const exportCtx = exportCanvas.getContext("2d");
-
+  
   // Clear the export canvas
   exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
-
+  
   // Draw each layer side by side on the strip
   layers.forEach((layerData, index) => {
     const xOffset = index * spriteWidthPixels;
     drawLayerToContextStrip(exportCtx, layerData, xOffset);
   });
-
+  
   // Convert the canvas to a data URL
   const imageDataURL = exportCanvas.toDataURL("image/png");
-
+  
   // Trigger a download using a hidden link
   const downloadLink = document.createElement("a");
   downloadLink.href = imageDataURL;
@@ -664,6 +681,31 @@ function drawLayerToContextStrip(ctx, data, xOffset) {
   }
 }
 
+function make_layer(data){
+  if(data!=null){
+    layers.push(JSON.parse(JSON.stringify(data)))
+  }else{
+    layers.push(blank(spriteWidth))
+  }
+  layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
+}
+
+// Create an offscreen canvas for a layer
+function createOffscreenCanvas(width, height) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  return canvas;
+}
+// Update a specific layer's offscreen canvas when edited
+function updateLayerCanvas(layerIndex) {
+  const layerCanvas = layerCanvases[layerIndex];
+  const ctx = layerCanvas.getContext("2d");
+  ctx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+  
+  // Draw the layer data onto its canvas
+  drawLayerToContextStrip(ctx, layers[layerIndex], 0);
+}
 
 </script>
 </body>
