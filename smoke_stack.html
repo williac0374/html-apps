@@ -300,6 +300,7 @@ if(event.key=='p'){paintFill(cellY, cellX, color);draw_data(data);copy_data();da
     draw_data(data);
   }
   keys[event.keyCode]=true
+if(event.key=='e'){if(confirm('export sprite strip?')){export_sprite_strip()}}
 if(event.key=='u'){copy_up()}
 if(event.key=='a'){if(anim8){anim8=false}else{anim8=true;animate()}}
 if(event.key=='m') {if(mode=="stack"){mode="animate";layer=0;this.innerText="animate"}else{mode="stack";this.innerText="stack"};mLeft=false;}
@@ -600,6 +601,54 @@ function padZero(str, len) {
   var zeros = new Array(len).join('0');
   return (zeros + str).slice(-len);
 }
+function export_sprite_strip() {
+  // Set the export dimensions
+  const spriteHeight = spriteWidth; // Height of each layer
+  const spriteWidthPixels = spriteWidth; // Width of each layer
+  const stripWidth = spriteWidthPixels * layers.length; // Total width of the sprite strip
+
+  // Create a temporary canvas for the sprite strip
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = stripWidth;
+  exportCanvas.height = spriteHeight;
+  const exportCtx = exportCanvas.getContext("2d");
+
+  // Clear the export canvas
+  exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+  // Draw each layer side by side on the strip
+  layers.forEach((layerData, index) => {
+    const xOffset = index * spriteWidthPixels;
+    drawLayerToContextStrip(exportCtx, layerData, xOffset);
+  });
+
+  // Convert the canvas to a data URL
+  const imageDataURL = exportCanvas.toDataURL("image/png");
+
+  // Trigger a download using a hidden link
+  const downloadLink = document.createElement("a");
+  downloadLink.href = imageDataURL;
+  downloadLink.download = "sprite_strip.png"; // Default file name
+  downloadLink.style.display = "none"; // Hide the link from the UI
+  document.body.appendChild(downloadLink); // Add to the DOM
+  downloadLink.click(); // Trigger the download
+  document.body.removeChild(downloadLink); // Clean up
+}
+
+// Helper function to draw a single layer on the strip
+function drawLayerToContextStrip(ctx, data, xOffset) {
+  const scale = 1; // 1:1 scale for pixel-accurate output
+  for (let y = 0; y < spriteWidth; y++) {
+    for (let x = 0; x < spriteWidth; x++) {
+      if (data[y][x] !== '#feeeef') { // Skip empty pixels
+        ctx.fillStyle = data[y][x];
+        ctx.fillRect((x * scale) + xOffset, y * scale, scale, scale);
+      }
+    }
+  }
+}
+
+
 </script>
 </body>
 </html>
