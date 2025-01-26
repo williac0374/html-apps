@@ -89,39 +89,109 @@ body {
   height: 93vh;
   background-color: purple;
 }
+#layer_display{
+  position: absolute;
+  left:1%;
+  top: 1%;
+  width: 98%;
+  height: 24%;
+  font-size: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ff3322;
+}
+#layer_control{
+  position: absolute;
+  left:1%;
+  top: 25%;
+  width: 98%;
+  height: 24%;
+  font-size: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ff33ff;
+}
+#right_panel canvas{
+  position: absolute;
+  left:25%;
+  top: 50%;
+  width: 50%;
+  height: 48%;
+  background-color: #003322;
+}
 </style>
 </head>
 <body>
 <div id='menu_panel'>
 <button id="new_stack">new_stack</button>
 <button id="new_palette">new_palette</button>
-<button id="test">TEST!</button>
+<button id="mode" onclick='if(mode=="stack"){mode="animate";layer=0;this.innerText="animate"}else{mode="stack";this.innerText="stack"};mLeft=false;'>animate!</button>
 </div>
 <div id='left_panel'>
 <div id='palette_panel'>
 <canvas id="palette_panel_canvas"></canvas>
 </div>
 </div>
-<div id='right_panel'></div>
+<div id='right_panel'>
+<div id='layer_display'>1 LAYER</div>
+<div id='layer_control'>LAYER_0</div>
+<canvas id="preview_canvas"></canvas>
+</div>
 <div id='current_layer'>
 <canvas id="current_layer_canvas"></canvas>
 </div>
+<canvas id="offscreen_canvas" style='display:none;'></canvas>
 <script>
-spriteWidth = 32;
-data = []
-for (let y = 0; y < spriteWidth; y++) {
-  var row = [];
-  for (let x = 0; x < spriteWidth; x++) {
-    row.push(null);
-  }
-  data.push(row);
-};
+
+function blank(sw){
+  let temp = []
+  for (let y = 0; y < sw; y++) {
+    var row = [];
+    for (let x = 0; x < sw; x++) {
+      row.push('#feeeef');
+    }
+    temp.push(row);
+  };
+  return JSON.parse(JSON.stringify(temp))
+}
+function data_clear(sw){
+  data = []
+  for (let y = 0; y < sw; y++) {
+    var row = [];
+    for (let x = 0; x < sw; x++) {
+      row.push('#feeeef');
+    }
+    data.push(row);
+  };
+}
+spriteWidth = 8;
+data_clear(spriteWidth)
 color = '#ffffff'
+mx = 0;
+my = 0;
+cx=0;
+cy=0;
+previewScale = 2
+cellX = 0;
+cellY = 0;
 mLeft=false;
+mRight=false;
+gs=0;
+layers = []
+layer=0;
+keys=[];
+layers.push(JSON.parse(JSON.stringify(data)))
+cLayer = document.getElementById("layer_control");
+lDisplay = document.getElementById("layer_display");
+lDisplay.innerText='hello world'
 Ppanel = document.getElementById("palette_panel");
-Rpanel = document.getElementById("right_panel");
 Pcanvas = document.getElementById("palette_panel_canvas");
 Pctx = Pcanvas.getContext("2d");
+Rpanel = document.getElementById("right_panel");
+Prevcanvas = document.getElementById("preview_canvas");
+Prectx = Prevcanvas.getContext("2d");
 cLay = document.getElementById("current_layer");
 Rpanel.style.left = cLay.getBoundingClientRect().right+'px'
 Rpanel.style.width = (window.innerWidth-cLay.getBoundingClientRect().right)+'px'
@@ -129,31 +199,118 @@ cLcanvas = document.getElementById("current_layer_canvas");
 cLctx = cLcanvas.getContext("2d");
 cLcanvas.width=cLcanvas.getBoundingClientRect().width
 cLcanvas.height=cLcanvas.getBoundingClientRect().height
+Prevcanvas.width=Prevcanvas.getBoundingClientRect().width
+Prevcanvas.height=Prevcanvas.getBoundingClientRect().height
+oFFcanvas = document.getElementById("offscreen_canvas");
+oFFctx = oFFcanvas.getContext("2d");
+
 let palette = new Image();
 palette.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAACACAMAAADTa0c4AAADAFBMVEUAAAAiIDRFKDxmOTGPVjvfcSbZoGbuw5r78jaZ5VBqvjA3lG5LaS9SSyQyPDk/P3QwYIJbbuFjm/9fzeTL2/z///+brbeEfodpampZVlJ2QoqsMjLZV2PXe7qPl0qKbzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQfngCAAAAwUlEQVR42uzaoQ0AMAhFQWgquv/EHQH/uWdBXYKja6jD56eWBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANtRvWgifOwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCg6z/ACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgPj8BzgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQ3wcAAP//AwDmDQE3Ixu6CAAAAABJRU5ErkJggg==';
 palette.loaded=false;
 tick=0
+animSpeed=500
+stackOffset = 10
+anim8 = false;
+mode='animate'
 palette.onload = function () {
   Pctx.drawImage(palette, 0, 0, Pcanvas.width, Pcanvas.height);
 setInterval(function(){main()},100)
 };
-function main(){
-  // for random stuff to do
+function animate(){
+  layer++
   
+  if(mode=='animate'){
+  if(layer==layers.length){layer=0}
+    data_2_canvas(Prectx,layers[layer],previewScale)
+    data_clear(spriteWidth)
+    data=JSON.parse(JSON.stringify(layers[layer]))
+    draw_data(data);
+  }
+  if(mode=='stack'){
+    draw_stack(layer,stackOffset)
+    
+  }
+  var speed = animSpeed
+if(mode=='stack'){speed=animSpeed*0.01}
+if(anim8){setTimeout(function(){animate()},speed)}
 }
 
+function main(){
+  // for random stuff to do
+  if(layers.length>1){
+    lDisplay.innerText=layers.length+' layers'
+  }else{
+    lDisplay.innerText=layers.length+' layer'
+  }
+  cLayer.innerText='layer '+layer;
+  if(keys[16]&&keys[61]){
+    keys[16]=false;
+    keys[51]=false;
+    if(confirm('make new layer?')){
+      layers.push(blank(spriteWidth))
+    }
+  }
+  rect = cLcanvas.getBoundingClientRect();
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+    cLcanvas.style.cursor = "none";
+  }else{
+    cLcanvas.style.cursor = "default";
+  }
+  ///////////////////////////////////////////////////////////////////////////////////
+  rect = cLayer.getBoundingClientRect();
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+    if(mLeft&&layers.length>1){
+      layer++
+    if(layer==layers.length){layer=0}
+      data_2_canvas(Prectx,layers[layer],previewScale)
+      data_clear(spriteWidth)
+      data=JSON.parse(JSON.stringify(layers[layer]))
+      draw_data(data);
+    }
+    mLeft=false;
+  }
+  
+  rect = lDisplay.getBoundingClientRect();
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+    if(mLeft){
+      if(confirm('make new layer?')){
+        layers.push(blank(spriteWidth))
+      }
+      mLeft=false;
+    }
+  }
+}
+function copy_data(){
+  layers[layer]=JSON.parse(JSON.stringify(data))
+}
 ////////////////////////////////////////////////////////////////////
 // INPUT HANDLING
 ////////////////////////////////////////////////////////////////////
 document.addEventListener('keydown', function(event) {
   //event.key event.keyCode
 if(event.key=='Escape'){window.close()}
+if(event.key=='p'){paintFill(cellY, cellX, color);draw_data(data);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);event.key=null}
+  if(event.key=='ArrowUp'&&layers.length>1){
+    
+    layer++
+  if(layer==layers.length){layer=0}
+    data_2_canvas(Prectx,layers[layer],previewScale)
+    data_clear(spriteWidth)
+    data=JSON.parse(JSON.stringify(layers[layer]))
+    draw_data(data);
+  }
+  keys[event.keyCode]=true
+if(event.key=='u'){copy_up()}
+if(event.key=='a'){if(anim8){anim8=false}else{anim8=true;animate()}}
+if(event.key=='m') {if(mode=="stack"){mode="animate";layer=0;this.innerText="animate"}else{mode="stack";this.innerText="stack"};mLeft=false;}
+  //alert(event.key)
+  //alert(event.keyCode)
 });
 document.addEventListener('keyup', function(event) {
   //event.key event.keyCode
+  keys[event.keyCode]=false
 });
 addEventListener('mousemove', function(event) {
-  let mx, my;
   // Otherwise use mouse input
   if (event.pageX != undefined && event.pageY != undefined) {
     mx = event.pageX;
@@ -162,8 +319,79 @@ addEventListener('mousemove', function(event) {
     mx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     my = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
   }
-  ////////color picker code
+  rect = cLcanvas.getBoundingClientRect();
+  scaleX = cLcanvas.width / rect.width;  // Scale factor for X
+  scaleY = cLcanvas.height / rect.height; // Scale factor for Y
+  adjustedX = (mx - rect.left) * scaleX;
+  adjustedY = (my - rect.top) * scaleY;
+  // snaps into place according to grid overlay
+  cx = Math.round(adjustedX/gs)*gs
+  cy = Math.round(adjustedY/gs)*gs
+  cellX = cx/gs
+  cellY = cy/gs
+if(cellX<0){cellX=0}
+if(cellY<0){cellY=0}
+if(cellY>spriteWidth-1){cellY=spriteWidth-1}
+  draw_data(data)
+});
+document.addEventListener('mousedown', function(event) {
+  // event.button  0 left 1 middle 2 right
+if(event.button==0){mLeft=true}
+if(event.button==2){mRight=true}
   
+  ////////color picker code
+  var rect = Pcanvas.getBoundingClientRect();
+  //checks if its over the palette for color picking and left mouse is down
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom&&mLeft){
+    var scaleX = Pcanvas.width / rect.width;  // Scale factor for X
+    var scaleY = Pcanvas.height / rect.height; // Scale factor for Y
+    var adjustedX = (mx - rect.left) * scaleX;
+    var adjustedY = (my - rect.top) * scaleY;
+    const eyeDropper = getPixelColor(adjustedX, adjustedY);
+    color = eyeDropper;
+    // document.title=color
+    mLeft=false
+  }
+  draw_data(data)
+});
+document.addEventListener('mouseup', function(event) {
+if(event.button==0){mLeft=false}
+if(event.button==2){mRight=false}
+  // event.button  0 left 1 middle 2 right
+});
+window.addEventListener('contextmenu', function(event) {event.preventDefault()});
+document.addEventListener('wheel', function(event) {
+  //event.deltaY >0 down <0 up
+  let wheel = 0
+if(event.deltaY>0){wheel=1}
+if(event.deltaY<0){wheel=-1}
+  
+  var rect = Prevcanvas.getBoundingClientRect();
+  //checks if its over the preview for scale adjustment
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+    previewScale+=wheel
+  if(previewScale<1){previewScale=1}
+    if(mode=='animate'){
+      data_2_canvas(Prectx,layers[layer],previewScale)
+    }
+    if(mode=='stack'){
+    if(keys[89]){stackOffset+=wheel}
+      
+    }
+    
+  }
+  rect = cLcanvas.getBoundingClientRect();
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+    layer+=wheel
+  if(layer<0){layer=0}
+  if(layer>layers.length-1){layer=layers.length-1}
+    data_2_canvas(Prectx,layers[layer],previewScale)
+    data_clear(spriteWidth)
+    data=JSON.parse(JSON.stringify(layers[layer]))
+    draw_data(data);
+  }
+});
+function getPaletteColor(){
   var rect = Pcanvas.getBoundingClientRect();
   //checks if its over the palette for color picking
   if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
@@ -174,52 +402,7 @@ addEventListener('mousemove', function(event) {
     const eyeDropper = getPixelColor(adjustedX, adjustedY);
   if(mLeft){color = eyeDropper}
   }
-  //////////////////////////////////////////////////////////
-  // clears cLcanvas
-  cLctx.clearRect(0, 0, cLcanvas.width, cLcanvas.height);
-  //draws layer grid
-  let gs = cLcanvas.getBoundingClientRect().height/spriteWidth
-  drawGrid(cLctx,gs)
-  ///////////////////////////////////////////////////////
-  //data[] setting code
-  rect = cLcanvas.getBoundingClientRect();
-  scaleX = cLcanvas.width / rect.width;  // Scale factor for X
-  scaleY = cLcanvas.height / rect.height; // Scale factor for Y
-  adjustedX = (mx - rect.left) * scaleX;
-  adjustedY = (my - rect.top) * scaleY;
-  // snaps into place according to grid overlay
-  let cx = Math.round(adjustedX/gs)*gs
-  let cy = Math.round(adjustedY/gs)*gs
-  let cellX = cx/gs
-  let cellY = cy/gs
-  document.title=color
-  // assigns data colors according to cellX and cellY if left mouse button is down.
-  if(mLeft){data[cellY][cellX]=color}
-  // goes thru and draws current layer data values to cLcanvas.
-  for (let y = 0; y < spriteWidth; y++) {
-    for (let x = 0; x < spriteWidth; x++) {
-      if(data[y][x]!=null){
-        cLctx.fillStyle = data[y][x];
-        cLctx.fillRect(x*gs,y*gs,gs,gs)
-      }
-    }
-  }
-  // draws cursor box on cLcanvas
-  cLctx.fillStyle = color;
-  cLctx.fillRect(cx,cy,gs,gs)
-});
-document.addEventListener('mousedown', function(event) {
-if(event.button==0){mLeft=true}
-  // event.button  0 left 1 middle 2 right
-});
-document.addEventListener('mouseup', function(event) {
-if(event.button==0){mLeft=false}
-  // event.button  0 left 1 middle 2 right
-});
-window.addEventListener('contextmenu', function(event) {event.preventDefault()});
-document.addEventListener('wheel', function(event) {
-  //event.deltaY >0 down <0 up
-});
+}
 function getPixelColor(x, y) {
   const imageData = Pctx.getImageData(x, y, 1, 1);
   const [r, g, b] = imageData.data; // Extract RGB values
@@ -249,6 +432,173 @@ function drawGrid(ctx,gridSize){
   ctx.closePath();
   ctx.stroke();
   
+}
+function data_2_canvas(ctx,data,scale){
+  var rect = ctx.canvas.getBoundingClientRect();
+  let width = rect.width;
+  let height = rect.height
+  let offX = (width-spriteWidth*scale)/2
+  let offY = (height-spriteWidth*scale)
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  for (let y = 0; y < spriteWidth; y++) {
+    for (let x = 0; x < spriteWidth; x++) {
+      if (data[y][x] !='#feeeef') {
+        ctx.fillStyle = data[y][x];
+        ctx.fillRect((x*scale)+offX,(y*scale)+offY,scale,scale)
+      }
+    }
+  }
+}
+function copy_up(){
+  if(layer<layers.length-1){// not currently on the topmost layer.
+    layers[layer+1] = JSON.parse(JSON.stringify(layers[layer]))
+    layer++
+    data_2_canvas(Prectx,layers[layer],previewScale)
+    data_clear(spriteWidth)
+    data=JSON.parse(JSON.stringify(layers[layer]))
+    draw_data(data);
+  }else{ // youll have to create a new layer to copy up to.
+    layers.push(JSON.parse(JSON.stringify(layers[layer])))
+    layer++
+    data_2_canvas(Prectx,layers[layer],previewScale)
+    data_clear(spriteWidth)
+    data=JSON.parse(JSON.stringify(layers[layer]))
+    draw_data(data);
+    
+  }
+}
+function paintFill(startX, startY, fillColor) {
+  const targetColor = data[startX][startY];
+if (targetColor === fillColor) {return;}
+  function isValid(x, y) {
+    return (
+    x >= 0 &&
+    x < spriteWidth &&
+    y >= 0 &&
+    y < spriteWidth &&
+    data[x][y] === targetColor
+    );
+  }
+  let stack = [[startX, startY]];
+  while (stack.length > 0) {
+    const [x, y] = stack.pop();
+    let left = x;
+    while (isValid(left - 1, y)) left--;
+    let right = x;
+    while (isValid(right + 1, y)) right++;
+    for (let i = left; i <= right; i++) {
+      data[i][y] = fillColor;
+      if (isValid(i, y - 1)) stack.push([i, y - 1]);
+      if (isValid(i, y + 1)) stack.push([i, y + 1]);
+    }
+  }
+}
+function draw_data(_data){
+  if(mode=='animate'){
+    // clears cLcanvas
+    cLctx.clearRect(0, 0, cLcanvas.width, cLcanvas.height);
+    //draws layer grid
+    gs = cLcanvas.getBoundingClientRect().height/spriteWidth
+    drawGrid(cLctx,gs)
+    // assigns data colors according to cellX and cellY if left mouse button is down.
+  if(mLeft){data[cellY][cellX]=color;copy_data();data_2_canvas(Prectx,layers[layer],previewScale)}
+  if(mRight){data[cellY][cellX]='#feeeef';copy_data();data_2_canvas(Prectx,layers[layer],previewScale)}
+    // goes thru and draws current layer data values to cLcanvas.
+    for (let y = 0; y < spriteWidth; y++) {
+      for (let x = 0; x < spriteWidth; x++) {
+        if(layer>0){
+          if(layers[layer-1][y][x]!='#feeeef'){
+            cLctx.fillStyle = layers[layer-1][y][x];
+            cLctx.globalAlpha=0.5
+            cLctx.fillRect(x*gs,y*gs,gs,gs)
+            cLctx.globalAlpha=1
+          }
+        }
+        if(data[y][x]!='#feeeef'){
+          cLctx.fillStyle = data[y][x];
+          cLctx.fillRect(x*gs,y*gs,gs,gs)
+        }
+      }
+    }
+    // draws cursor box on cLcanvas
+    cLctx.fillStyle = color;
+    cLctx. strokeStyle = invertColor(color);
+    cLctx.fillRect(cx,cy,gs,gs)
+    cLctx.lineWidth = 3;
+    cLctx.strokeRect(cx,cy,gs,gs)
+  }
+}
+
+function draw_stack(rot,yoffset) {
+  const canvasWidth = oFFcanvas.width;
+  const canvasHeight = oFFcanvas.height;
+  const stackOffset = yoffset; // Vertical offset between layers.
+  const centerX = canvasWidth / 2;
+  const centerY = canvasHeight / 2;
+  const rotationAngle = (Math.PI / 180) * rot; // Example rotation angle for all layers.
+  
+  // Clear the offscreen canvas
+  oFFctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  
+  layers.forEach((layerData, index) => {
+    const yOffset = index * stackOffset; // Incremental height offset.
+    
+    // Save the current context state
+    oFFctx.save();
+    
+    // Translate to the canvas center, apply the offset, and rotate
+    oFFctx.translate(centerX, centerY - yOffset);
+    oFFctx.rotate(rotationAngle);
+    
+    // Draw the layer (centered)
+    drawLayerToContext(oFFctx, layerData);
+    
+    // Restore the context for the next layer
+    oFFctx.restore();
+  });
+  Prectx.clearRect(0, 0, Prectx.canvas.width, Prectx.canvas.height);
+  Prectx.drawImage(oFFctx.canvas, 0, 0, Prectx.canvas.width, Prectx.canvas.height);
+}
+
+// Helper function to draw a single layer
+function drawLayerToContext(ctx, data) {
+  const scale = 10; // Scale for the size of each layer.
+  const halfWidth = (spriteWidth * scale) / 2;
+  
+  for (let y = 0; y < spriteWidth; y++) {
+    for (let x = 0; x < spriteWidth; x++) {
+      if (data[y][x] !== '#feeeef') { // Skip empty pixels
+        ctx.fillStyle = data[y][x];
+        ctx.fillRect((x * scale) - halfWidth, (y * scale) - halfWidth, scale, scale);
+      }
+    }
+  }
+}
+
+
+function invertColor(hex) {
+  if (hex.indexOf('#') === 0) {
+    hex = hex.slice(1);
+  }
+  // convert 3-digit hex to 6-digits.
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
+  if (hex.length !== 6) {
+    throw new Error('Invalid HEX color.');
+  }
+  // invert color components
+  var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
+  g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
+  b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
+  // pad each with zeros and return
+  return '#' + padZero(r) + padZero(g) + padZero(b);
+}
+
+function padZero(str, len) {
+  len = len || 2;
+  var zeros = new Array(len).join('0');
+  return (zeros + str).slice(-len);
 }
 </script>
 </body>
