@@ -166,7 +166,7 @@ function data_clear(sw){
     data.push(row);
   };
 }
-spriteWidth = 8;
+spriteWidth = 32;
 data_clear(spriteWidth)
 color = '#ffffff'
 mx = 0;
@@ -210,11 +210,12 @@ palette.loaded=false;
 tick=0
 animSpeed=500
 stackOffset = 10
+stackScale = 2
 anim8 = false;
 mode='animate'
 palette.onload = function () {
   Pctx.drawImage(palette, 0, 0, Pcanvas.width, Pcanvas.height);
-setInterval(function(){main()},100)
+setTimeout(function(){main()},100)
 };
 function animate(){
   layer++
@@ -234,7 +235,19 @@ function animate(){
 if(mode=='stack'){speed=animSpeed*0.01}
 if(anim8){setTimeout(function(){animate()},speed)}
 }
+ frameCount = 0; // To track the number of frames
+ lastTime = performance.now(); // Initial time for the FPS calculation
+ fps = 0; // Current FPS value
 
+function calculateFPS() {
+  const now = performance.now(); // Get the current time
+  frameCount++; // Increment the frame count
+  if (now - lastTime >= 1000) {
+    fps = frameCount; // FPS is the number of frames counted in 1 second
+    frameCount = 0; // Reset the frame count
+    lastTime = now; // Reset the timer
+  }
+}
 function main(){
   // for random stuff to do
   if(layers.length>1){
@@ -279,6 +292,9 @@ function main(){
       mLeft=false;
     }
   }
+   calculateFPS();
+  document.title='FPS : '+fps
+  requestAnimationFrame(main);
 }
 function copy_data(){
   layers[layer]=JSON.parse(JSON.stringify(data))
@@ -563,7 +579,7 @@ function draw_stack(rot,yoffset) {
 
 // Helper function to draw a single layer
 function drawLayerToContext(ctx, data) {
-  const scale = 10; // Scale for the size of each layer.
+  const scale = stackScale; // Scale for the size of each layer.
   const halfWidth = (spriteWidth * scale) / 2;
   
   for (let y = 0; y < spriteWidth; y++) {
