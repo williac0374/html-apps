@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spooky</title>
+<style>
+body{
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  
+}
+canvas {
+  // border: 2px solid #000;
+  background-color: white;
+}
+</style>
+</head>
+
+<body>
+<canvas id="canvas" width="512" height="512"></canvas>
+<script>
+tankySPR = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAQCAYAAAD506FJAAAA90lEQVR4nO2VQQ6DMAwEeQriA73wi76k/39AemklVBmahIi18YyUC/KYA9llmgAgPcU4PTMAEJCzBUCBAARGXQAUyE14vh7le46eefWzog4wBfBBHYCRvnW8+1lRBzi6Pwx1ALL7e3tqPS/+dkfNrDpA7nzjAzQVwKiLFy1A0f2jHTWuB9/a8W/eXQDVvqoALDfaBcSnAML7qgJQ/wGz+3t7aj0v/nZHzay7AAbzh6EOQHbf2tXibFnmtSzzKvNbUAfITQDVWJe1NwBqP3oBnIUCuM4HJ3gqoB5/JBTAdT6AOyiA9ncA3IZMBQAAP0QqAAAYTIQCeANb9TsI5MerpAAAAABJRU5ErkJggg=='
+function start(){
+  tankStrip = draw_set_image(tankySPR)
+  tankRot=0
+  hide_mouse()
+  tanks = []
+  for(let i = 0; i < 30; i++){
+    let temp ={
+      x:random(canvas.width-tankStrip.height*4)+tankStrip.height*4,
+      y:random(canvas.height-tankStrip.height*4)+tankStrip.height*4,
+      w:tankStrip.height,
+      h:tankStrip.height,
+      rot:random(360),
+      myCan:null,
+      myCtx:null,
+      canDo:function(){
+        this.myCan=createOffscreenCanvas(this.w, this.h)
+        this.myCtx= this.myCan.getContext("2d");
+      },
+      draw:function(){
+        draw_stack(this.myCtx,tankStrip,this.rot+=random(5))
+      }
+    }
+    temp.canDo()
+    tanks.push(temp)
+  }
+}
+function createOffscreenCanvas(width, height) {
+  const canvas = document.createElement("canvas");
+  canvas.style.position = 'absolute';
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.left = '100px'
+  canvas.style.top = '100px'
+  canvas.style.display = 'block';
+  canvas.style.backgroundColor = 'red';
+  document.body.appendChild(canvas);
+  return canvas;
+}
+function loop(){
+if(keyboard_check_pressed(vk_escape)){window.close()}
+  
+  document.title ='FPS: '+fps
+}
+function draw(){
+  for(let i = 0; i < tanks.length; i++){tanks[i].draw()}
+  //draw_image(img,x,y,w,h,rot,ox,oy,source_x,source_y,source_w,source_h)
+  //for(let i = 0; i < tanks.length; i++){tanks[i].myCan,this.x,this.y,32,32,0,0,0,0,0,this.w,this.h}
+}
+function draw_stack(ctx,img,rot){
+  let wide = floor(img.width/img.height)
+  let tall = img.height
+  let yOff = 0
+  for(let i = 0;i<img.width;i+=tall){
+    yOff+=tall/10
+     ctx.save();
+    ctx.translate(tall/2,tall/2);
+    if(rot!=0){
+    ctx.rotate(rot*Math.PI/180);//tu_r2d = -180 / Math.PI, tu_d2r = Math.PI / -180
+    }
+    //ctx.drawImage(img,source_x, source_y, source_w, source_h, -ox,-oy,w,h);
+    ctx.drawImage(img,i,0,tall,tall, -tall/2,-tall/2,tall,tall);
+    ctx.restore()
+  }
+}
+
+</script>
+<script type='text/javascript' src='engine.js'></script>
+
+</body>
+</html>
