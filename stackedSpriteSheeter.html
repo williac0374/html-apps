@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprite Strip Editor</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+canvas {
+  border: 1px solid black;
+  margin: 10px;
+}
+#controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px;
+}
+label {
+  display: flex;
+  justify-content: space-between;
+  width: 300px;
+}
+</style>
+</head>
+<body>
+<div id="controls">
+<h1>Sprite Strip Editor</h1>
+<button id="loadStripButton">Load Sprite Strip</button>
+<label>
+<span>Canvas Width:</span>
+<input type="number" id="canvasWidth" value="512">
+</label>
+<label>
+<span>Canvas Height:</span>
+<input type="number" id="canvasHeight" value="512">
+</label>
+<label>
+<span>Stack Width:</span>
+<input type="number" id="stackWidth" value="64">
+</label>
+<label>
+<span>Stack Height:</span>
+<input type="number" id="stackHeight" value="64">
+</label>
+<label>
+<span>Y Origin:</span>
+<input type="number" id="stackYorigin" value="64">
+</label>
+<label>
+<span>Stack Y Offset:</span>
+<input type="number" id="stackYOffset" value="10">
+</label>
+<label>
+<span>Stack Rotation (Degrees):</span>
+<input type="number" id="stackRotation" value="0">
+</label>
+<button id="saveSpritesButton">Save Stacked Sprites</button>
+</div>
+<canvas id="previewCanvas"></canvas>
+<script>
+const loadStripButton = document.getElementById("loadStripButton");
+const previewCanvas = document.getElementById("previewCanvas");
+const ctx = previewCanvas.getContext("2d");
+const canvasWidthInput = document.getElementById("canvasWidth");
+const canvasHeightInput = document.getElementById("canvasHeight");
+const stackWidthInput = document.getElementById("stackWidth");
+const stackHeightInput = document.getElementById("stackHeight");
+const stackYOffsetInput = document.getElementById("stackYOffset");
+const stackRotationInput = document.getElementById("stackRotation");
+const saveSpritesButton = document.getElementById("saveSpritesButton");
+const stackYoriginInput = document.getElementById("stackYorigin");
+let spriteStrip = null;
+let frames = [];
+
+// Load the sprite strip
+function load_strip(){
+  // Create file input
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.addEventListener('change', function(event) {
+    var file = event.target.files[0];
+    if (file) {
+      // Read the file as base64
+      var reader = new FileReader();
+      reader.onload = function(readerEvent) {
+        const img = new Image();
+        img.src = readerEvent.target.result;
+        img.onload = () => {
+          spriteStrip = img;
+          extractFrames();
+          drawPreview();
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  // Trigger the file input click
+  fileInput.click();
+}
+loadStripButton.addEventListener("click", function(){
+load_strip()
+});
+
+// Extract frames from the sprite strip
+function extractFrames() {
+  const frameWidth = spriteStrip.height; // Assuming frames are square
+  const numFrames = Math.floor(spriteStrip.width / frameWidth);
+  
+  frames = [];
+  for (let i = 0; i < numFrames; i++) {
+    const canvas = document.createElement("canvas");
+    canvas.width = frameWidth;
+    canvas.height = frameWidth;
+    const context = canvas.getContext("2d");
+    context.drawImage(
+    spriteStrip,
+    i * frameWidth,
+    0,
+    frameWidth,
+    frameWidth,
+    0,
+    0,
+    frameWidth,
+    frameWidth
+    );
+    frames.push(canvas);
+  }
+}
+
+// Draw the preview canvas
+function drawPreview() {
+  const canvasWidth = parseInt(canvasWidthInput.value);
+  const canvasHeight = parseInt(canvasHeightInput.value);
+  const stackWidth = parseInt(stackWidthInput.value);
+  const stackHeight = parseInt(stackHeightInput.value);
+  const stackYOffset = parseInt(stackYOffsetInput.value);
+  const stackRotation = parseInt(stackRotationInput.value);
+  const stack_origin = parseInt(stackYorigin.value);
+  previewCanvas.width = canvasWidth;
+  previewCanvas.height = canvasHeight;
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  
+  const centerX = canvasWidth / 2;
+  const centerY = (canvasHeight / 2)+stack_origin;
+  
+  frames.forEach((frame, index) => {
+    ctx.save();
+    const yOffset = index * stackYOffset;
+    ctx.translate(centerX, centerY - yOffset);
+    ctx.rotate((Math.PI / 180) * stackRotation);
+    ctx.drawImage(
+    frame,
+    -stackWidth / 2,
+    -stackHeight / 2,
+    stackWidth,
+    stackHeight
+    );
+    ctx.restore();
+  });
+}
+
+// Redraw preview on control changes
+[canvasWidthInput, canvasHeightInput, stackWidthInput, stackHeightInput, stackYOffsetInput, stackYoriginInput,stackRotationInput].forEach(
+(input) => {
+  input.addEventListener("input", drawPreview);
+}
+);
+
+// Save stacked sprites
+saveSpritesButton.addEventListener("click", () => {
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = previewCanvas.width;
+  exportCanvas.height = previewCanvas.height;
+  const exportCtx = exportCanvas.getContext("2d");
+  exportCtx.drawImage(previewCanvas, 0, 0);
+  
+  exportCanvas.toBlob((blob) => {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "stacked_sprites.png";
+    link.click();
+  });
+});
+</script>
+</body>
+</html>
