@@ -46,7 +46,7 @@ body {
   position: absolute;
   left:0vw;
   top:7vh;
-  width: 5vw;
+  width: 20vw;
   height: 93vh;
   background-color: blue;
 }
@@ -62,8 +62,26 @@ body {
   left:3%;
   top: 3%;
   width: 94%;
-  height: 94%;
+  height: 27%;
   background-color: purple;
+}
+#hMirror{
+  position: absolute;
+  left:3%;
+  top: 50%;
+  width: 94%;
+  height: 10%;
+  color: white;
+  background-color: grey;
+}
+#vMirror{
+  position: absolute;
+  left:3%;
+  top: 60%;
+  width: 94%;
+  height: 10%;
+  color: white;
+  background-color: grey;
 }
 #current_layer{
   position: absolute;
@@ -135,6 +153,8 @@ body {
 <div id='palette_panel'>
 <canvas id="palette_panel_canvas"></canvas>
 </div>
+<button id="hMirror" onclick="if(horMirror){horMirror=false;this.style.background='grey';}else{horMirror=true;this.style.background='green'}">H mirror</button>
+<button id="vMirror" onclick="if(verMirror){verMirror=false;this.style.background='grey';}else{verMirror=true;this.style.background='green'}">V mirror</button>
 </div>
 <div id='right_panel'>
 <div id='layer_display'>1 LAYER</div>
@@ -182,6 +202,8 @@ function reset(sw){
   cy=0;
   pencilSize=1;
   previewScale = 2
+  horMirror = false
+  verMirror = false
   cellX = 0;
   cellY = 0;
   mLeft=false;
@@ -232,7 +254,7 @@ const blob = new Blob([content], { type: "text/json" }); // Create a Blob object
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
-reset(12)
+reset(16)
 cLayer = document.getElementById("layer_control");
 lDisplay = document.getElementById("layer_display");
 lDisplay.innerText='hello world'
@@ -362,7 +384,7 @@ function main(){
     }
   }
   calculateFPS()
-  document.title='FPS: '+fps
+  //document.title='FPS: '+fps
   requestAnimationFrame(main);
 }
 function copy_data(){
@@ -618,6 +640,26 @@ if (targetColor === fillColor) {return;}
     }
   }
 }
+function pencil(startX, startY, endX, endY, fillColor) {
+  rect = cLcanvas.getBoundingClientRect();
+if(mx<rect.left||mx>rect.right||my<rect.top||my>rect.bottom){return}
+  for(let x = startX;x<endX;x++){
+    for(let y = startY;y<endY;y++){
+      if(x<spriteWidth&&y<spriteWidth){
+        data[y][x] = fillColor;
+      }
+    }
+  }
+}
+function eraser(startX, startY, endX, endY, fillColor) {
+  for(let x = startX;x<endX;x++){
+    for(let y = startY;y<endY;y++){
+      if(x<spriteWidth&&y<spriteWidth){
+        data[y][x] = '#feeeef';
+      }
+    }
+  }
+}
 function draw_data(_data){
   if(mode=='animate'){
     // clears cLcanvas
@@ -625,21 +667,30 @@ function draw_data(_data){
     //draws layer grid
     gs = cLcanvas.getBoundingClientRect().height/spriteWidth
     drawGrid(cLctx,gs)
-    // assigns data colors according to cellX and cellY if left mouse button is down.
-    for(let py = 0;py < pencilSize; py++){
-      for(let px = 0;px < pencilSize; px++){
-        if(cellY+py<spriteWidth&&cellX+px<spriteWidth){
-        if(mLeft){data[cellY+py][cellX+px]=color;copy_data();data_2_canvas(Prectx,layers[layer],previewScale)}
-        }
+    // assigns data colors according to cellX and cellY if left mouse button is down. data[cellY][cellX]=color
+    if(mLeft){
+      pencil(cellX, cellY, cellX+pencilSize, cellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+      vMcellY = (spriteWidth-1)-cellY-(pencilSize-1)
+      hMcellX = (spriteWidth-1)-cellX-(pencilSize-1)
+      if(verMirror&&horMirror){
+        pencil(cellX, vMcellY, cellX+pencilSize, vMcellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+        pencil(hMcellX, cellY, hMcellX+pencilSize, cellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+        pencil(hMcellX, vMcellY, hMcellX+pencilSize, vMcellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+      }
+      if(verMirror&&!horMirror){
+        pencil(cellX, vMcellY, cellX+pencilSize, vMcellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+      }
+      if(!verMirror&&horMirror){
+        pencil(hMcellX, cellY, hMcellX+pencilSize, cellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
       }
     }
-    for(let py = 0;py < pencilSize; py++){
-      for(let px = 0;px < pencilSize; px++){
-        if(cellY+py<spriteWidth&&cellX+px<spriteWidth){
-        if(mRight){data[cellY+py][cellX+px]='#feeeef';copy_data();data_2_canvas(Prectx,layers[layer],previewScale)}
-        }
-      }
+    
+    if(mRight){
+      eraser(cellX, cellY, cellX+pencilSize, cellY+pencilSize, color);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+      data[cellY][cellX]='#feeeef';copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+      
     }
+    
     // goes thru and draws current layer data values to cLcanvas.
     for (let y = 0; y < spriteWidth; y++) {
       for (let x = 0; x < spriteWidth; x++) {
@@ -664,6 +715,44 @@ function draw_data(_data){
     cLctx.fillRect(cx,cy,gs*pencilSize,gs*pencilSize)
     cLctx.lineWidth = 3;
     cLctx.strokeRect(cx,cy,gs*pencilSize,gs*pencilSize)
+    hMcellX = Math.floor(cx/gs) // gets the data[x]
+    hMx = ((spriteWidth-1)-(hMcellX+pencilSize-1))*gs
+    vMcellY = Math.floor(cy/gs) // gets the data[y]
+    vMy = ((spriteWidth-1)-(vMcellY+pencilSize-1))*gs
+    if(horMirror&&!verMirror){
+      cLctx.fillStyle = color;
+      cLctx. strokeStyle = invertColor(color);
+      cLctx.fillRect(hMx,cy,gs*pencilSize,gs*pencilSize)
+      cLctx.lineWidth = 3;
+      cLctx.strokeRect(hMx,cy,gs*pencilSize,gs*pencilSize)
+    }
+    if(verMirror&&!horMirror){
+      cLctx.fillStyle = color;
+      cLctx. strokeStyle = invertColor(color);
+      cLctx.fillRect(cx,vMy,gs*pencilSize,gs*pencilSize)
+      cLctx.lineWidth = 3;
+      cLctx.strokeRect(cx,vMy,gs*pencilSize,gs*pencilSize)
+    }
+    if(verMirror&&horMirror){
+      cLctx.fillStyle = color;
+      cLctx. strokeStyle = invertColor(color);
+      cLctx.fillRect(hMx,cy,gs*pencilSize,gs*pencilSize)
+      cLctx.lineWidth = 3;
+      cLctx.strokeRect(hMx,cy,gs*pencilSize,gs*pencilSize)
+
+      cLctx.fillStyle = color;
+      cLctx. strokeStyle = invertColor(color);
+      cLctx.fillRect(cx,vMy,gs*pencilSize,gs*pencilSize)
+      cLctx.lineWidth = 3;
+      cLctx.strokeRect(cx,vMy,gs*pencilSize,gs*pencilSize)
+      
+      cLctx.fillStyle = color;
+      cLctx. strokeStyle = invertColor(color);
+      cLctx.fillRect(hMx,vMy,gs*pencilSize,gs*pencilSize)
+      cLctx.lineWidth = 3;
+      cLctx.strokeRect(hMx,vMy,gs*pencilSize,gs*pencilSize)
+      
+    }
   }
 }
 
