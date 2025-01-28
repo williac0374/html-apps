@@ -271,15 +271,15 @@ body {
 <div id="new_layer"onclick="make_layer()">New Layer</div>
 <div id="remove_layer"onclick="if(layer>0){remove_layer(layer);layer--}">Remove Layer</div>
 <div id="copy_up"onclick="copy_up()">Copy Up</div>
-<div id="line"onclick="line=true;_pencil=false;paint=false;mLeft=false">Line</div>
+<div id="line"onclick="line=true;_pencil=false;paint=false;horMirror=false;verMirror=false;mLeft=false">Line</div>
 <div ></div>
 <div ></div>
 <div ></div>
 <div ></div>
 <div ></div>
-<div ></div>
-<div ></div>
-<div ></div>
+<div id="pencilPlus"onclick="if(pencilSize>1){pencilSize--}">[1]</div>
+<div onclick="load()">LOAD</div>
+<div onclick="save()">SAVE</div>
 </div>
 </div>
 <div id='right_panel'>
@@ -384,6 +384,12 @@ function load(){
         spriteWidth = project.spriteWidth;
         layers = [];
         layers = project.layers;
+        layerCanvases = [];
+        for(let i = 0; i < layers.length; i ++){
+        layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
+         updateLayerCanvas(i) 
+        }
+        
         layer = 0;
         data = JSON.parse(JSON.stringify(layers[layer]))
         draw_data(data)
@@ -682,7 +688,16 @@ window.addEventListener('contextmenu', function(event) {event.preventDefault()})
 
 //stackScaleYDiv = document.getElementById("stackScaleY");
 //stackOffsetDiv = document.getElementById("stackOffset");
-stackRotDiv
+
+document.getElementById("pencilPlus").addEventListener('wheel', function(event) {
+  let wheel = 0
+if(event.deltaY>0){wheel=1}
+if(event.deltaY<0){wheel=-1}
+  pencilSize+=wheel;
+  if(pencilSize<1){pencilSize=1}
+  if(pencilSize>spriteWidth){pencilSize=spriteWidth}
+  this.innerText='['+pencilSize+']'
+});
 stackRotDiv.addEventListener('wheel', function(event) {
   let wheel = 0
 if(event.deltaY>0){wheel=1}
@@ -699,7 +714,7 @@ stackScaleYDiv.addEventListener('wheel', function(event) {
   let wheel = 0
 if(event.deltaY>0){wheel=1}
 if(event.deltaY<0){wheel=-1}
-  stackScale+=wheel;
+  stackScale+=wheel*0.1;
 });
 document.addEventListener('wheel', function(event) {
   //event.deltaY >0 down <0 up
@@ -910,6 +925,7 @@ function draw_data(_data){
     rect = cLcanvas.getBoundingClientRect();
     if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
       if(mLeft){
+    
         if(_pencil){
           pencil(cellX, cellY, cellX+pencilSize, cellY+pencilSize, color);
           vMcellY = (spriteWidth-1)-cellY-(pencilSize-1)
@@ -1004,11 +1020,13 @@ function draw_data(_data){
     // draws cursor box on cLcanvas
     cLctx.fillStyle = color;
     cLctx. strokeStyle = invertColor(color);
-    cLctx.fillRect(cx,cy,gs*pencilSize,gs*pencilSize)
+    let tempSize = pencilSize
+    if(line){tempSize=1}
+    cLctx.fillRect(cx,cy,gs*tempSize,gs*tempSize)
     let md=gs/4
     cLctx.lineWidth = 3;
-    cLctx.strokeRect(cx+md,cy+md,gs*pencilSize-md*2,gs*pencilSize-md*2)
-    cLctx.strokeRect(cx,cy,gs*pencilSize,gs*pencilSize)
+    cLctx.strokeRect(cx+md,cy+md,gs*tempSize-md*2,gs*tempSize-md*2)
+    cLctx.strokeRect(cx,cy,gs*tempSize,gs*tempSize)
     hMcellX = Math.floor(cx/gs) // gets the data[x]
     hMx = ((spriteWidth-1)-(hMcellX+pencilSize-1))*gs
     vMcellY = Math.floor(cy/gs) // gets the data[y]
