@@ -55,7 +55,7 @@ body {
   top:0%;
   width: 100%;
   height: 33%;
-  background-color: orange;
+  background-color: blue;
 }
 #palette_panel canvas{
   position: absolute;
@@ -63,7 +63,7 @@ body {
   top: 3%;
   width: 94%;
   height: 27%;
-  background-color: purple;
+  background-color: blue;
 }
 
 #left_panel_menu {
@@ -80,7 +80,7 @@ body {
   margin: 2px;
   background-color: var(--blue);
   color: var(--white);
-  border: none;
+  //border:3px solid white;
   text-align: center;
   vertical-align: middle;
   line-height: 35px;
@@ -113,7 +113,7 @@ body {
   top:7vh;
   width: 20vw;
   height: 93vh;
-  background-color: purple;
+  background-color: blue;
 }
 #layer_display{
   position: absolute;
@@ -141,14 +141,116 @@ body {
 }
 #right_panel canvas{
   position: absolute;
-  left:5%;
+  left:1%;
   top: 18%;
   width: 80%;
   height: 80%;
   background-color: #003322;
 }
 
+#animateDiv{
+  position: absolute;
+  left:83%;
+  top: 18%;
+  width: 15%;
+  height: 10%;
+  background-color: var(--blue);
+  color: var(--white);
+  //border:3px solid white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 75px;
+}
+#animateDiv:hover {
+  background-color: var(--white);
+  color: black;
+}
+#stack{
+  position: absolute;
+  left:83%;
+  top: 30%;
+  width: 15%;
+  height: 10%;
+  background-color: var(--blue);
+  color: var(--white);
+  //border:3px solid white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 75px;
+}
+#stack:hover {
+  background-color: var(--white);
+  color: black;
+}
+#stackOffset{
+  position: absolute;
+  left:83%;
+  top: 42%;
+  width: 15%;
+  height: 10%;
+  background-color: var(--blue);
+  color: var(--white);
+  //border:3px solid white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 75px;
+}
+#stackOffset:hover {
+  background-color: var(--white);
+  color: black;
+}
 
+#stackScaleY{
+  position: absolute;
+  left:83%;
+  top: 54%;
+  width: 15%;
+  height: 10%;
+  background-color: var(--blue);
+  color: var(--white);
+  //border:3px solid white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 75px;
+}
+#stackScaleY:hover {
+  background-color: var(--white);
+  color: black;
+}
+#stackRot{
+  position: absolute;
+  left:83%;
+  top: 66%;
+  width: 15%;
+  height: 10%;
+  background-color: var(--blue);
+  color: var(--white);
+  //border:3px solid white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 75px;
+}
+#stackRot:hover {
+  background-color: var(--white);
+  color: black;
+}
+#makeSheet{
+  position: absolute;
+  left:83%;
+  top: 78%;
+  width: 15%;
+  height: 10%;
+  background-color: var(--blue);
+  color: var(--white);
+  //border:3px solid white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 75px;
+}
+#makeSheet:hover {
+  background-color: var(--white);
+  color: black;
+}
 </style>
 </head>
 <body>
@@ -162,8 +264,8 @@ body {
 <canvas id="palette_panel_canvas"></canvas>
 </div>
 <div id="left_panel_menu">
-<div id="hMirror" onclick="if(horMirror){horMirror=false;this.style.background='#1e90ff';}else{horMirror=true;this.style.background='green'}">H mirror</div>
-<div id="vMirror" onclick="if(verMirror){verMirror=false;this.style.background='#1e90ff';}else{verMirror=true;this.style.background='green'}">V mirror</div>
+<div id="hMirror" onclick="if(horMirror){horMirror=false;this.style.background='#1e90ff';}else{horMirror=true;this.style.background='blue'}">H mirror</div>
+<div id="vMirror" onclick="if(verMirror){verMirror=false;this.style.background='#1e90ff';}else{verMirror=true;this.style.background='blue'}">V mirror</div>
 <div id="pencil"onclick="_pencil=true;line=false;paint=false;mLeft=false">Pencil</div>
 <div id="paint"onclick="_pencil=false;line=false;paint=true;mLeft=false">Paint</div>
 <div id="new_layer"onclick="make_layer()">New Layer</div>
@@ -184,13 +286,19 @@ body {
 <div id='layer_display'>1 LAYER</div>
 <div id='layer_control'>LAYER_0</div>
 <canvas id="preview_canvas"></canvas>
+<div id="animateDiv" onclick="if(anim8==true){anim8=false}else{anim8=true;animating()}">animate</div>
+<div id="stack"onclick="if(stacked==true){stacked=false}else{stacked=true;stack_spin()}">stack</div>
+<div id="stackOffset" >Offset</div>
+<div id="stackScaleY" >Scale</div>
+<div id="stackRot" >Rotate</div>
+<div id="makeSheet">Export</div>
 </div>
 <div id='current_layer'>
 <canvas id="current_layer_canvas"></canvas>
 </div>
 <canvas id="offscreen_canvas" style='display:none;'></canvas>
 <script>
-
+//<div id="stackOffset" >Offset</div>
 function blank(sw){
   let temp = []
   for (let y = 0; y < sw; y++) {
@@ -224,6 +332,14 @@ function reset(sw){
   oy=0;
   cx=0;
   cy=0;
+  tick=0
+  animSpeed=500;
+  anim8 = false;
+  stacked=false;
+  stackRot=0;
+  stackOffsetY=2;
+  stackScale=1;
+  mode='animate'
   _pencil=true;
   paint=false;
   line=false;
@@ -295,6 +411,12 @@ const blob = new Blob([content], { type: "text/json" }); // Create a Blob object
   URL.revokeObjectURL(url);
 }
 reset(16)
+
+stackRotDiv = document.getElementById("stackRot");
+stackScaleYDiv = document.getElementById("stackScaleY");
+stackOffsetDiv = document.getElementById("stackOffset");
+stackDiv = document.getElementById("stack");
+animateDiv = document.getElementById("animateDiv");
 lineDiv = document.getElementById("line");
 pencilDiv = document.getElementById("pencil");
 paintDiv = document.getElementById("paint");
@@ -343,18 +465,22 @@ function newPalette(){
 let palette = new Image();
 palette.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAACACAMAAADTa0c4AAADAFBMVEUAAAAiIDRFKDxmOTGPVjvfcSbZoGbuw5r78jaZ5VBqvjA3lG5LaS9SSyQyPDk/P3QwYIJbbuFjm/9fzeTL2/z///+brbeEfodpampZVlJ2QoqsMjLZV2PXe7qPl0qKbzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQfngCAAAAwUlEQVR42uzaoQ0AMAhFQWgquv/EHQH/uWdBXYKja6jD56eWBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANtRvWgifOwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCg6z/ACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgPj8BzgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQ3wcAAP//AwDmDQE3Ixu6CAAAAABJRU5ErkJggg==';
 palette.loaded=false;
-tick=0
-animSpeed=500
-stackOffset = 10
-anim8 = false;
-mode='animate'
+
 palette.onload = function () {
   Pctx.drawImage(palette, 0, 0, Pcanvas.width, Pcanvas.height);
 setTimeout(function(){main()},100)
 };
-function animate(){
+function animating(){
+  if(!anim8||stacked){
+    anim8=false
+    layer=0;
+    data_2_canvas(Prectx,layers[layer],previewScale)
+    data_clear(spriteWidth)
+    data=JSON.parse(JSON.stringify(layers[layer]))
+    draw_data(data);
+    return;
+  }
   layer++
-  
   if(mode=='animate'){
   if(layer==layers.length){layer=0}
     data_2_canvas(Prectx,layers[layer],previewScale)
@@ -363,13 +489,17 @@ function animate(){
     draw_data(data);
   }
   if(mode=='stack'){
-    draw_stack(layer,stackOffset)
+    draw_stack()
     
   }
-  var speed = animSpeed
-if(mode=='stack'){speed=animSpeed*0.01}
-if(anim8){setTimeout(function(){animate()},speed)}
+if(anim8){setTimeout(function(){animating()},animSpeed)}
 }
+function stack_spin(){
+  draw_stack()
+if(stacked){setTimeout(function(){stack_spin()},300)}
+}
+
+
 frameCount = 0; // To track the number of frames
 lastTime = performance.now(); // Initial time for the FPS calculation
 fps = 0; // Current FPS value
@@ -428,10 +558,12 @@ function main(){
   }
   calculateFPS()
   //document.title='FPS: '+fps
-  lineDiv
-if(line==true){lineDiv.style.background='green'}else{lineDiv.style.background='#1e90ff'}
-if(_pencil==true){pencilDiv.style.background='green'}else{pencilDiv.style.background='#1e90ff'}
-if(paint==true){paintDiv.style.background='green'}else{paintDiv.style.background='#1e90ff'}
+  
+if(stacked==true){stackDiv.style.background='blue'}else{stackDiv.style.background='#1e90ff'}
+if(anim8==true){animateDiv.style.background='blue'}else{animateDiv.style.background='#1e90ff'}
+if(line==true){lineDiv.style.background='blue'}else{lineDiv.style.background='#1e90ff'}
+if(_pencil==true){pencilDiv.style.background='blue'}else{pencilDiv.style.background='#1e90ff'}
+if(paint==true){paintDiv.style.background='blue'}else{paintDiv.style.background='#1e90ff'}
   
   
   
@@ -547,6 +679,28 @@ if(event.button==2){mRight=false}
   // event.button  0 left 1 middle 2 right
 });
 window.addEventListener('contextmenu', function(event) {event.preventDefault()});
+
+//stackScaleYDiv = document.getElementById("stackScaleY");
+//stackOffsetDiv = document.getElementById("stackOffset");
+stackRotDiv
+stackRotDiv.addEventListener('wheel', function(event) {
+  let wheel = 0
+if(event.deltaY>0){wheel=1}
+if(event.deltaY<0){wheel=-1}
+  stackRot+=wheel;
+});
+stackOffsetDiv.addEventListener('wheel', function(event) {
+  let wheel = 0
+if(event.deltaY>0){wheel=1}
+if(event.deltaY<0){wheel=-1}
+  stackOffsetY+=wheel;
+});
+stackScaleYDiv.addEventListener('wheel', function(event) {
+  let wheel = 0
+if(event.deltaY>0){wheel=1}
+if(event.deltaY<0){wheel=-1}
+  stackScale+=wheel;
+});
 document.addEventListener('wheel', function(event) {
   //event.deltaY >0 down <0 up
   let wheel = 0
@@ -562,7 +716,7 @@ if(event.deltaY<0){wheel=-1}
       data_2_canvas(Prectx,layers[layer],previewScale)
     }
     if(mode=='stack'){
-    if(keys[72]){stackOffset+=wheel} // h key
+    if(keys[72]){stackOffsetY+=wheel} // h key
       
     }
     
@@ -790,7 +944,7 @@ function draw_data(_data){
             }else{
               for (let y = 0; y < spriteWidth; y++) {
                 for (let x = 0; x < spriteWidth; x++) {
-                  if (lineData[y][x] !== '#feeeef') { 
+                  if (lineData[y][x] !== '#feeeef') {
                     data[y][x]=color
                   }
                 }
@@ -898,13 +1052,18 @@ function draw_data(_data){
 
 
 // Draw the stack using pre-rendered canvases
-function draw_stack(rot,yoffset) {
+function draw_stack() {
+  /*
+  stackRot=0;
+  stackOffsetY=2;
+  stackScale=1;
+  */
   const canvasWidth = oFFcanvas.width;
   const canvasHeight = oFFcanvas.height;
-  const stackOffset = yoffset; // Vertical offset between layers
+  const stackOffset = stackOffsetY; // Vertical offset between layers
   const centerX = canvasWidth / 2;
   const centerY = canvasHeight / 2;
-  const rotationAngle = (Math.PI / 180) * rot; // Example rotation angle
+  const rotationAngle = (Math.PI / 180) * stackRot; // Example rotation angle
   
   // Clear the preview canvas
   oFFctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -919,15 +1078,15 @@ function draw_stack(rot,yoffset) {
     oFFctx.translate(centerX, centerY - yOffset);
     oFFctx.rotate(rotationAngle);
     
-    let offX = (layerCanvas.width*previewScale / 2)
-    let offY = (layerCanvas.height*previewScale / 2)
+    let offX = (layerCanvas.width*stackScale / 2)
+    let offY = (layerCanvas.height*stackScale / 2)
     // Draw the pre-rendered canvas
     oFFctx.drawImage(
     layerCanvas,
     -offX,
     -offY,
-    layerCanvas.width*previewScale,
-    layerCanvas.height*previewScale
+    layerCanvas.width*stackScale,
+    layerCanvas.height*stackScale
     );
     
     // Restore context for the next layer
