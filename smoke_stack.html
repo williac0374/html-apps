@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>smoke stack</title>
@@ -19,7 +20,7 @@ body {
   justify-content: center;
   height: 100vh;
   width: 100vw;
-  background-color: #f0f0f0;
+  background-color: #003322;
 }
 #menu_panel {
   position: absolute;
@@ -36,6 +37,18 @@ body {
   color: var(--white);
   border: none;
   padding: 10px 31px;
+  cursor: pointer;
+}
+#menu_panel div {
+  position absolute;
+  background-color:  var(--blue);
+  color: var(--white);
+  border: solid 1px white;
+  left:50%
+  height:100%
+  width:55%
+  margin:10px;
+  padding: 10px 210px;
   cursor: pointer;
 }
 #menu_panel button:hover {
@@ -55,7 +68,7 @@ body {
   top:0%;
   width: 100%;
   height: 33%;
-  background-color: blue;
+  background-color: #003322;
 }
 #palette_panel canvas{
   position: absolute;
@@ -71,7 +84,7 @@ body {
   top:34%;
   width: 100%;
   height: 67%;
-  background-color: #4CAF50;
+  background-color: #003322;
   color: #fff;
 }
 
@@ -115,34 +128,11 @@ body {
   height: 93vh;
   background-color: blue;
 }
-#layer_display{
-  position: absolute;
-  left:1%;
-  top: 1%;
-  width: 98%;
-  height: 7%;
-  font-size: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #ff3322;
-}
-#layer_control{
-  position: absolute;
-  left:1%;
-  top: 8%;
-  width: 98%;
-  height: 7%;
-  font-size: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #ff33ff;
-}
+
 #right_panel canvas{
   position: absolute;
   left:1%;
-  top: 18%;
+  top: 0%;
   width: 80%;
   height: 80%;
   background-color: #003322;
@@ -151,7 +141,7 @@ body {
 #animateDiv{
   position: absolute;
   left:83%;
-  top: 18%;
+  top: 2%;
   width: 15%;
   height: 10%;
   background-color: var(--blue);
@@ -159,7 +149,7 @@ body {
   //border:3px solid white;
   text-align: center;
   vertical-align: middle;
-  line-height: 75px;
+  line-height: 50px;
 }
 #animateDiv:hover {
   background-color: var(--white);
@@ -168,7 +158,7 @@ body {
 #stack{
   position: absolute;
   left:83%;
-  top: 30%;
+  top: 14%;
   width: 15%;
   height: 10%;
   background-color: var(--blue);
@@ -176,7 +166,7 @@ body {
   //border:3px solid white;
   text-align: center;
   vertical-align: middle;
-  line-height: 75px;
+  line-height: 50px;
 }
 #stack:hover {
   background-color: var(--white);
@@ -185,7 +175,7 @@ body {
 #stackOffset{
   position: absolute;
   left:83%;
-  top: 42%;
+  top: 26%;
   width: 15%;
   height: 10%;
   background-color: var(--blue);
@@ -193,7 +183,7 @@ body {
   //border:3px solid white;
   text-align: center;
   vertical-align: middle;
-  line-height: 75px;
+  line-height: 50px;
 }
 #stackOffset:hover {
   background-color: var(--white);
@@ -203,7 +193,7 @@ body {
 #stackScaleY{
   position: absolute;
   left:83%;
-  top: 54%;
+  top: 38%;
   width: 15%;
   height: 10%;
   background-color: var(--blue);
@@ -211,7 +201,7 @@ body {
   //border:3px solid white;
   text-align: center;
   vertical-align: middle;
-  line-height: 75px;
+  line-height: 50px;
 }
 #stackScaleY:hover {
   background-color: var(--white);
@@ -220,7 +210,7 @@ body {
 #stackRot{
   position: absolute;
   left:83%;
-  top: 66%;
+  top: 50%;
   width: 15%;
   height: 10%;
   background-color: var(--blue);
@@ -228,7 +218,7 @@ body {
   //border:3px solid white;
   text-align: center;
   vertical-align: middle;
-  line-height: 75px;
+  line-height: 50px;
 }
 #stackRot:hover {
   background-color: var(--white);
@@ -237,7 +227,7 @@ body {
 #makeSheet{
   position: absolute;
   left:83%;
-  top: 78%;
+  top: 62%;
   width: 15%;
   height: 10%;
   background-color: var(--blue);
@@ -245,7 +235,7 @@ body {
   //border:3px solid white;
   text-align: center;
   vertical-align: middle;
-  line-height: 75px;
+  line-height: 50px;
 }
 #makeSheet:hover {
   background-color: var(--white);
@@ -256,49 +246,49 @@ body {
 <body>
 <input type="file" id="fileInput" accept=".json" style="display:none">
 <div id='menu_panel'>
-<button id="new_stack"onclick='Prectx.clearRect(0, 0, Prectx.canvas.width, Prectx.canvas.height);anim8=false;mode="animate";reset(parseInt(prompt("sprite size?")))'>new_stack</button>
+<button id="new_stack"onclick='Prectx.clearRect(0, 0, Prectx.canvas.width, Prectx.canvas.height);anim8=false;mode="animate";reset(parseInt(prompt("sprite size?","16")))'>new_stack</button>
 <button id="new_palette" onclick="newPalette()">new_palette</button>
+<div id="layerInfo">LAYERS 1/1</div>
 </div>
 <div id='left_panel'>
 <div id='palette_panel'>
 <canvas id="palette_panel_canvas"></canvas>
 </div>
 <div id="left_panel_menu">
-<div id="hMirror" onclick="if(horMirror){horMirror=false;this.style.background='#1e90ff';}else{horMirror=true;this.style.background='blue'}">H mirror</div>
-<div id="vMirror" onclick="if(verMirror){verMirror=false;this.style.background='#1e90ff';}else{verMirror=true;this.style.background='blue'}">V mirror</div>
+<div id="hMirror" onclick="if(horMirror){horMirror=false}else{horMirror=true}">H mirror</div>
+<div id="vMirror" onclick="if(verMirror){verMirror=false}else{verMirror=true}">V mirror</div>
 <div id="pencil"onclick="_pencil=true;line=false;paint=false;mLeft=false">Pencil</div>
-<div id="paint"onclick="_pencil=false;line=false;paint=true;mLeft=false">Paint</div>
+<div id="paint"onclick="_pencil=false;pencilSize=1;horMirror=false;verMirror=false;line=false;paint=true;mLeft=false">Paint</div>
 <div id="new_layer"onclick="make_layer()">New Layer</div>
 <div id="remove_layer"onclick="if(layer>0){remove_layer(layer);layer--}">Remove Layer</div>
 <div id="copy_up"onclick="copy_up()">Copy Up</div>
 <div id="line"onclick="line=true;_pencil=false;paint=false;horMirror=false;verMirror=false;mLeft=false">Line</div>
-<div ></div>
-<div ></div>
-<div ></div>
-<div ></div>
-<div ></div>
+<div onclick="upLayer()">UP LAYER</div>
+<div onclick="downLayer()">DOWN LAYER</div>
+<div >?</div>
+<div >?</div>
+<div onclick="clear_layer(layer)">CLEAR</div>
+
 <div id="pencilPlus"onclick="if(pencilSize>1){pencilSize--}">[1]</div>
 <div onclick="load()">LOAD</div>
 <div onclick="save()">SAVE</div>
 </div>
 </div>
 <div id='right_panel'>
-<div id='layer_display'>1 LAYER</div>
-<div id='layer_control'>LAYER_0</div>
 <canvas id="preview_canvas"></canvas>
 <div id="animateDiv" onclick="if(anim8==true){anim8=false}else{anim8=true;animating()}">animate</div>
 <div id="stack"onclick="if(stacked==true){stacked=false}else{stacked=true;stack_spin()}">stack</div>
 <div id="stackOffset" >Offset</div>
 <div id="stackScaleY" >Scale</div>
 <div id="stackRot" >Rotate</div>
-<div id="makeSheet">Export</div>
+<div id="makeSheet"onclick="export_sprite_strip()">Export</div>
 </div>
 <div id='current_layer'>
 <canvas id="current_layer_canvas"></canvas>
 </div>
 <canvas id="offscreen_canvas" style='display:none;'></canvas>
+
 <script>
-//<div id="stackOffset" >Offset</div>
 function blank(sw){
   let temp = []
   for (let y = 0; y < sw; y++) {
@@ -386,8 +376,8 @@ function load(){
         layers = project.layers;
         layerCanvases = [];
         for(let i = 0; i < layers.length; i ++){
-        layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
-         updateLayerCanvas(i) 
+          layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
+          updateLayerCanvas(i)
         }
         
         layer = 0;
@@ -418,6 +408,10 @@ const blob = new Blob([content], { type: "text/json" }); // Create a Blob object
 }
 reset(16)
 
+layerInfoDiv = document.getElementById("layerInfo");
+pencilPlusDiv = document.getElementById("pencilPlus");
+hMirrorDiv = document.getElementById("hMirror");
+vMirrorDiv = document.getElementById("vMirror");
 stackRotDiv = document.getElementById("stackRot");
 stackScaleYDiv = document.getElementById("stackScaleY");
 stackOffsetDiv = document.getElementById("stackOffset");
@@ -426,9 +420,6 @@ animateDiv = document.getElementById("animateDiv");
 lineDiv = document.getElementById("line");
 pencilDiv = document.getElementById("pencil");
 paintDiv = document.getElementById("paint");
-cLayer = document.getElementById("layer_control");
-lDisplay = document.getElementById("layer_display");
-lDisplay.innerText='hello world'
 Ppanel = document.getElementById("palette_panel");
 Pcanvas = document.getElementById("palette_panel_canvas");
 Pctx = Pcanvas.getContext("2d");
@@ -504,8 +495,27 @@ function stack_spin(){
   draw_stack()
 if(stacked){setTimeout(function(){stack_spin()},300)}
 }
-
-
+function clear_layer(layer){
+  layers[layer] = blank(spriteWidth);
+  data_2_canvas(Prectx,layers[layer],previewScale)
+  data = blank(spriteWidth)
+  updateLayerCanvas(layer)
+  
+}
+function upLayer(){
+if(layer<layers.length-1){layer++}else{return}
+  data_2_canvas(Prectx,layers[layer],previewScale)
+  data_clear(spriteWidth)
+  data=JSON.parse(JSON.stringify(layers[layer]))
+  draw_data(data);
+}
+function downLayer(){
+if(layer>0){layer--}else{return}
+  data_2_canvas(Prectx,layers[layer],previewScale)
+  data_clear(spriteWidth)
+  data=JSON.parse(JSON.stringify(layers[layer]))
+  draw_data(data);
+}
 frameCount = 0; // To track the number of frames
 lastTime = performance.now(); // Initial time for the FPS calculation
 fps = 0; // Current FPS value
@@ -520,19 +530,6 @@ function calculateFPS() {
 }
 function main(){
   // for random stuff to do
-  if(layers.length>1){
-    lDisplay.innerText=layers.length+' layers'
-  }else{
-    lDisplay.innerText=layers.length+' layer'
-  }
-  cLayer.innerText='layer '+layer;
-  if(keys[16]&&keys[61]){
-    keys[16]=false;
-    keys[51]=false;
-    if(confirm('make new layer?')){
-      make_layer()
-    }
-  }
   rect = cLcanvas.getBoundingClientRect();
   if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
     cLcanvas.style.cursor = "none";
@@ -540,31 +537,14 @@ function main(){
     cLcanvas.style.cursor = "default";
   }
   ///////////////////////////////////////////////////////////////////////////////////
-  rect = cLayer.getBoundingClientRect();
-  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
-    if(mLeft&&layers.length>1){
-      layer++
-    if(layer==layers.length){layer=0}
-      data_2_canvas(Prectx,layers[layer],previewScale)
-      data_clear(spriteWidth)
-      data=JSON.parse(JSON.stringify(layers[layer]))
-      draw_data(data);
-    }
-    mLeft=false;
-  }
   
-  rect = lDisplay.getBoundingClientRect();
-  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
-    if(mLeft){
-      if(confirm('make new layer?')){
-        make_layer()
-      }
-      mLeft=false;
-    }
-  }
+  
   calculateFPS()
   //document.title='FPS: '+fps
-  
+  layerInfoDiv.innerText = 'LAYERS  '+(layer+1)+' / '+layers.length
+  pencilPlusDiv.innerText = '['+pencilSize+']'
+if(horMirror==true){hMirrorDiv.style.background='blue'}else{hMirrorDiv.style.background='#1e90ff'}
+if(verMirror==true){vMirrorDiv.style.background='blue'}else{vMirrorDiv.style.background='#1e90ff'}
 if(stacked==true){stackDiv.style.background='blue'}else{stackDiv.style.background='#1e90ff'}
 if(anim8==true){animateDiv.style.background='blue'}else{animateDiv.style.background='#1e90ff'}
 if(line==true){lineDiv.style.background='blue'}else{lineDiv.style.background='#1e90ff'}
@@ -607,24 +587,8 @@ if(event.key=='b'){event.key=null}
   if(keys[39]){
     ox+=modifier
   }
-  
-  if(event.key=='Delete'){
-    data=[];
-    data=blank(spriteWidth);
-    draw_data(data);
-    copy_data();
-    data_2_canvas(Prectx,layers[layer],previewScale);
-    event.key=null
-  }
-if(event.key=='e'){if(confirm('export sprite strip?')){export_sprite_strip()}}
-if(event.key=='u'){copy_up()}
-if(event.key=='p'){pencilSizer=true}else{pencilSizer=false}
-if(event.key=='s'){event.key;save()}
-if(event.key=='l'){event.key;load()}
-if(event.key=='o'){if(oFFcanvas.style.display=='none'){oFFcanvas.style.display='block'}else{oFFcanvas.style.display='none'}}
-if(event.key=='a'){if(anim8){anim8=false}else{anim8=true;animate()}}
-if(event.key=='m') {if(mode=="stack"){mode="animate";layer=0;this.innerText="animate"}else{mode="stack";this.innerText="stack"};mLeft=false;}
-  //alert(event.key)
+
+ //alert(event.key)
   //alert(event.keyCode)
 });
 document.addEventListener('keyup', function(event) {
@@ -694,8 +658,8 @@ document.getElementById("pencilPlus").addEventListener('wheel', function(event) 
 if(event.deltaY>0){wheel=1}
 if(event.deltaY<0){wheel=-1}
   pencilSize+=wheel;
-  if(pencilSize<1){pencilSize=1}
-  if(pencilSize>spriteWidth){pencilSize=spriteWidth}
+if(pencilSize<1){pencilSize=1}
+if(pencilSize>spriteWidth){pencilSize=spriteWidth}
   this.innerText='['+pencilSize+']'
 });
 stackRotDiv.addEventListener('wheel', function(event) {
@@ -724,7 +688,7 @@ if(event.deltaY<0){wheel=-1}
   
   var rect = Prevcanvas.getBoundingClientRect();
   //checks if its over the preview for scale adjustment
-  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
+  if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom&&!stacked){
   if(!keys[72]){previewScale+=wheel}
   if(previewScale<1){previewScale=1}
     if(mode=='animate'){
@@ -925,7 +889,7 @@ function draw_data(_data){
     rect = cLcanvas.getBoundingClientRect();
     if(mx>rect.left&&mx<rect.right&&my>rect.top&&my<rect.bottom){
       if(mLeft){
-    
+        
         if(_pencil){
           pencil(cellX, cellY, cellX+pencilSize, cellY+pencilSize, color);
           vMcellY = (spriteWidth-1)-cellY-(pencilSize-1)
@@ -957,26 +921,34 @@ function draw_data(_data){
               lineData = blank(spriteWidth)
               drawLine(lineSx, lineSy, cellX, cellY, lineData, '#ff0000')
               
-            }else{
-              for (let y = 0; y < spriteWidth; y++) {
-                for (let x = 0; x < spriteWidth; x++) {
-                  if (lineData[y][x] !== '#feeeef') {
-                    data[y][x]=color
-                  }
-                }
-              };
-              lineSx=null;
-              lineSy=null;
-              lineEx=null;
-              lineEy=null;
-              lineData = blank(spriteWidth)
-              copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
-              
             }
           }
         }
+      }else{
+        if(line){ //draw line lineSx
+          
+          if(lineEx==null&&lineSx!=null){
+            lineData = blank(spriteWidth)
+            drawLine(lineSx, lineSy, cellX, cellY, lineData, '#ff0000')
+            
+          }else{
+            for (let y = 0; y < spriteWidth; y++) {
+              for (let x = 0; x < spriteWidth; x++) {
+                if (lineData[y][x] !== '#feeeef') {
+                  data[y][x]=color
+                }
+              }
+            };
+            lineSx=null;
+            lineSy=null;
+            lineEx=null;
+            lineEy=null;
+            lineData = blank(spriteWidth)
+            copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+            
+          }
+        }
       }
-      
       if(mRight){
         vMcellY = (spriteWidth-1)-cellY-(pencilSize-1)
         hMcellX = (spriteWidth-1)-cellX-(pencilSize-1)
@@ -1021,7 +993,7 @@ function draw_data(_data){
     cLctx.fillStyle = color;
     cLctx. strokeStyle = invertColor(color);
     let tempSize = pencilSize
-    if(line){tempSize=1}
+  if(line||paint){tempSize=1}
     cLctx.fillRect(cx,cy,gs*tempSize,gs*tempSize)
     let md=gs/4
     cLctx.lineWidth = 3;
