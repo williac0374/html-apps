@@ -265,7 +265,7 @@ body {
 <div id="line"onclick="line=true;_pencil=false;paint=false;horMirror=false;verMirror=false;mLeft=false">Line</div>
 <div onclick="upLayer()">UP LAYER</div>
 <div onclick="downLayer()">DOWN LAYER</div>
-<div >?</div>
+<div onclick="undo()">undo</div>
 <div >?</div>
 <div onclick="clear_layer(layer)">CLEAR</div>
 
@@ -313,6 +313,7 @@ function data_clear(sw){
 function reset(sw){
   spriteWidth = sw;
   data= []
+  undos = [];
   data_clear(sw)
   color = '#ffffff'
   pencilSizer = false;
@@ -572,24 +573,17 @@ document.addEventListener('keydown', function(event) {
   //89 y
   //37 left 38 up 39 right 40 down
   
-if(event.key=='Escape'){window.close()}
-if(event.key=='b'){event.key=null}
-  let modifier = 4
-  if(keys[38]){
-    oy-=modifier
-  }
-  if(keys[40]){
-    oy+=modifier
-  }
-  if(keys[37]){
-    ox-=modifier
-  }
-  if(keys[39]){
-    ox+=modifier
-  }
-
- //alert(event.key)
+if(event.key=='Escape'){if(confirm('close smoke_stack????')){window.close()}}
+  
+  //alert(event.key)
   //alert(event.keyCode)
+  //control && z undo function
+  if(keys[17]&&keys[90]){
+    undo();
+    keys[17]=false;
+    keys[90]=false;
+  }
+  
 });
 document.addEventListener('keyup', function(event) {
   //event.key event.keyCode
@@ -639,6 +633,9 @@ if(event.button==2){mRight=true}
     mLeft=false
   }
   draw_data(data)
+});
+cLcanvas.addEventListener('mouseup', function(event) {
+backup();
 });
 document.addEventListener('mouseup', function(event) {
 if(event.button==0){mLeft=false}
@@ -906,10 +903,12 @@ function draw_data(_data){
             pencil(hMcellX, cellY, hMcellX+pencilSize, cellY+pencilSize, color);
           }
           copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+          
         }else{
           if(paint){
             mLeft=false
             paintFill(cellY, cellX, color);draw_data(data);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+           
           }
           if(line){ //draw line lineSx
             if(lineSx==null){
@@ -945,6 +944,7 @@ function draw_data(_data){
             lineEy=null;
             lineData = blank(spriteWidth)
             copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+           
             
           }
         }
@@ -1100,7 +1100,18 @@ function drawLayerToContext(ctx, data) {
   }
 }
 
-
+function backup(){
+  undos.push(JSON.parse(JSON.stringify(data))); // backs up most recent data change
+if(undos.length>200){undos.splice(0,1)}// if 21 backups exist deletes the oldest one
+}
+function undo(){
+  if(undos.length==0){return}
+  data=[] // clears data
+  data = JSON.parse(JSON.stringify(undos[undos.length-1])) //sets data to latest undos[]
+  undos.splice(undos.length-1,1)//removes latest undos[]
+  //shows data revision
+  draw_data(data);copy_data();data_2_canvas(Prectx,layers[layer],previewScale);
+}
 function invertColor(hex) {
   if (hex.indexOf('#') === 0) {
     hex = hex.slice(1);
