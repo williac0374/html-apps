@@ -27,17 +27,18 @@ canvas {
 
 <script>
 size=2;
+grid_div=16;
 color=[255,255,255];
 color_index = -1;
 color_palette = [
-    [0, 0, 0], [34, 32, 52], [69, 40, 60], [102, 57, 49],
-    [143, 86, 59], [223, 113, 38], [217, 160, 102], [238, 195, 154],
-    [251, 242, 54], [153, 229, 80], [106, 190, 48], [55, 148, 110],
-    [75, 105, 47], [82, 75, 36], [50, 60, 57], [63, 63, 116],
-    [48, 96, 130], [91, 110, 225], [99, 155, 255], [95, 205, 228],
-    [203, 219, 252], [255, 255, 255], [155, 173, 183], [132, 126, 135],
-    [105, 106, 106], [89, 86, 82], [118, 66, 138], [172, 50, 50],
-    [217, 87, 99], [215, 123, 186], [143, 151, 74], [138, 111, 48]
+[0, 0, 0], [34, 32, 52], [69, 40, 60], [102, 57, 49],
+[143, 86, 59], [223, 113, 38], [217, 160, 102], [238, 195, 154],
+[251, 242, 54], [153, 229, 80], [106, 190, 48], [55, 148, 110],
+[75, 105, 47], [82, 75, 36], [50, 60, 57], [63, 63, 116],
+[48, 96, 130], [91, 110, 225], [99, 155, 255], [95, 205, 228],
+[203, 219, 252], [255, 255, 255], [155, 173, 183], [132, 126, 135],
+[105, 106, 106], [89, 86, 82], [118, 66, 138], [172, 50, 50],
+[217, 87, 99], [215, 123, 186], [143, 151, 74], [138, 111, 48]
 ];
 function resize(){
   // makes the whole body canvas the size of the current window
@@ -58,31 +59,69 @@ function resize(){
   xmod=menu.x;
   ymod=menu.y;
   var p = 0
-  for(let y = 0; y < 8; y++){
+  for(let y = 0; y < 4; y++){
     for(let x = 0; x < 8; x++){
       palettes[p].x=xmod+x*size;
       palettes[p].y=ymod+y*size;
       palettes[p].w=size;
       palettes[p].h=size;
-       palettes[p].col=color_palette[p];
+      palettes[p].col=color_palette[p];
       palettes[p].b_col=color_palette[p];
       p++
     }
   }
-  
+  //places and sizes menu buttons
+  tall = menu.w/8;
+  wide = menu.w/3;
+  let x=0
+  let y=0
+  for(let b = 0; b < buttons.length; b++){
+    buttons[b].x=menu.x+wide*x;
+    buttons[b].y=(menu.y+(menu.w/8)*4+8)+tall*y
+    buttons[b].w=wide;
+    buttons[b].h=tall;
+    x++
+    if(x==3){
+      x=0;y++
+    }
+  }
 }
 window.addEventListener('resize', function(){resize()});
 setTimeout(function(){resize()},100)
 draw_canvas = {
 x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],}
-menu = {x:0,y:0,w:0,h:0,col:[200,0,200],b_col:[80,80,80],}
+menu = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[255,255,255],}
 palettes = []
 for(let p = 0; p < 32; p++){
 let temp = {x:0,y:0,w:0,h:0,col:[200,0,200],b_col:[80,80,80]}
   palettes.push(temp)
 }
-
-
+buttons = []
+for(let p = 0; p < 21; p++){
+let temp = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],text:"button"+parseInt(p+1)}
+  buttons.push(temp)
+}
+function draw_grid(){
+  //draw_canvas
+  //grid_div
+  let size = draw_canvas.w/grid_div
+  let left=draw_canvas.x;
+  let top=draw_canvas.y;
+  let right=draw_canvas.x+draw_canvas.w;
+  let bottom=draw_canvas.y+draw_canvas.h;
+  draw_set_color(255,255,255)
+  draw_set_linewidth(1)
+  draw_set_linedash([4,5])
+  // horizontal lines
+  for(let y=top;y<bottom;y+=size){
+    draw_line(left, y, right, y)
+  }
+  // vertical lines
+  for(let x=left;x<right;x+=size){
+    draw_line(x, top, x,bottom)
+  }
+  draw_set_linedash([])
+}
 function draw_draw_canvas(){
   // draw draw_canvas
   draw_set_color(draw_canvas.col[0],draw_canvas.col[1],draw_canvas.col[2])
@@ -99,7 +138,15 @@ function draw_draw_canvas(){
     draw_set_color(palettes[p].col[0],palettes[p].col[1],palettes[p].col[2]);draw_rectangle(palettes[p].x, palettes[p].y, palettes[p].w, palettes[p].h,false,0,0,0);
     draw_set_color(palettes[p].b_col[0],palettes[p].b_col[1],palettes[p].b_col[2]);draw_rectangle(palettes[p].x+4, palettes[p].y+4, palettes[p].w-8, palettes[p].h-8,false,0,0,0);
   }
-  
+  //draw_buttons
+  for(let b = 0; b < buttons.length; b++){
+    draw_set_color(buttons[b].col[0],buttons[b].col[1],buttons[b].col[2]);draw_rectangle(buttons[b].x, buttons[b].y, buttons[b].w, buttons[b].h,false,0,0,0);
+    draw_set_color(buttons[b].b_col[0],buttons[b].b_col[1],buttons[b].b_col[2]);draw_rectangle(buttons[b].x+4, buttons[b].y+4, buttons[b].w-8, buttons[b].h-8,false,0,0,0);
+    
+    draw_set_color(255,255,255)
+    draw_centered_text(buttons[b].x+buttons[b].w/2, buttons[b].y+buttons[b].h/2, buttons[b].text, buttons[b].h/3, 400)
+  }
+  draw_grid();
 }
 function palette_handler(){
   let index = -1
@@ -109,10 +156,26 @@ function palette_handler(){
     let right = palettes[p].x+size;
     let bottom = palettes[p].x+size;
     if(mouse_x>left&&mouse_x<right&&mouse_y>top&&mouse_y<bottom){
-    index= p
+      index= p
     }
   }
   return index
+}
+function button_getter(){
+  let index = 'none'
+  for(let b = 0; b < buttons.length; b++){
+    let left = buttons[b].x;
+    let top = buttons[b].y;
+    let right = buttons[b].x+buttons[b].w;
+    let bottom = buttons[b].y+buttons[b].h;
+    if(mouse_x>left&&mouse_x<right&&mouse_y>top&&mouse_y<bottom){
+      index= buttons[b].text
+    }
+  }
+  return index
+}
+function button_handler(but){
+  alert(but)
 }
 function start(){
   
@@ -120,12 +183,24 @@ function start(){
 
 
 function loop(){//palette_handler()
-  if(mouse_check_pressed()){color=color_palette[palette_handler()]}
+  if(mouse_check_pressed()){
+    if(mouse_y<(menu.y+(menu.w/8)*4+8)){
+      color=color_palette[palette_handler()];
+    }else{
+      let bclicked = button_getter()
+    if(bclicked!='none'){button_handler(bclicked)}
+    }
+    mouse_pressed=false;
+    mouse_down=false;
+  }
   document.title=color
+  
+  
 }
 
 function draw(){
   draw_draw_canvas()
+  
 }
 
 
