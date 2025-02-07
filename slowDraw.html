@@ -23,7 +23,7 @@ canvas {
 </head>
 
 <body>
-  <input type="file" id="fileInput" accept=".json" style="display:none">
+<input type="file" id="fileInput" accept=".json" style="display:none">
 <canvas id="canvas"></canvas>
 
 <script>
@@ -48,6 +48,17 @@ function reset(px_width){
   color=color_palette[0];
   data=[]
   data = data_clear(grid_div)
+  frames = []
+  frame=0;
+  frames.push(JSON.parse(JSON.stringify(data)))
+  //alert(frames[frame].length)
+  
+  Hmirror=false;
+  Vmirror=false;
+  lockX = false;
+  lockY = false;
+  lastX = 0;
+  lastY = 0;
 }
 reset(16)
 function data_clear(sw){
@@ -62,6 +73,7 @@ function data_clear(sw){
   return temp
 }
 function data_entry(){
+if(frames.length==0){return}
   let mx=mouse_x;
   let my=mouse_y;
   if(grid_div!=0){
@@ -73,14 +85,28 @@ function data_entry(){
     if(mx>left&&mx<right&&my>top&&my<bottom){ // mouse is over draw_canvas
       let cellX = floor((mx-left)/size)
       let cellY = floor((my-top)/size)
+    if(lockX){cellX=lastX}else{lastX=cellX}
+    if(lockY){cellY=lastY}else{lastY=cellY}
       if(tool==0){//pencil
-        data[cellY][cellX]=color
+        
+        frames[frame][cellY][cellX]=color
+        if(Hmirror&&Vmirror){
+          frames[frame][cellY][grid_div-cellX-1]=color
+          frames[frame][grid_div-cellY-1][cellX]=color
+          frames[frame][grid_div-cellY-1][grid_div-cellX-1]=color
+        }else{
+        if(Hmirror){frames[frame][cellY][grid_div-cellX-1]=color}
+        if(Vmirror){frames[frame][grid_div-cellY-1][cellX]=color}
+        }
       }
       if(tool==1){//eraser
-        data[cellY][cellX]=[-1,-1,-1]
+        frames[frame][cellY][cellX]=[-1,-1,-1]
       }
       if(tool==2){//paint
         paintFill(cellX, cellY, color)
+      }
+      if(tool==3){//clear by color
+        paintFill(cellX, cellY, [-1,-1,-1])
       }
     }
     
@@ -88,14 +114,15 @@ function data_entry(){
   
 }
 function data_draw(){
-  for (let y = 0; y < data.length; y++) {
-    for (let x = 0; x < data.length; x++) {
-      if(data[y][x][0]!=-1){
+if(frames.length==0){return}
+  for (let y = 0; y < frames[frame].length; y++) {
+    for (let x = 0; x < frames[frame].length; x++) {
+      if(frames[frame][y][x][0]!=-1){
         if(grid_div!=0){
           let size = (draw_canvas.w-8)/grid_div
-          let r = data[y][x][0];
-          let g = data[y][x][1];
-          let b = data[y][x][2];
+          let r = frames[frame][y][x][0];
+          let g = frames[frame][y][x][1];
+          let b = frames[frame][y][x][2];
           draw_set_color(r,g,b)
           draw_rectangle(draw_canvas.x+4+x*size, draw_canvas.y+4+y*size, size, size,false,0,0,0)
         }
@@ -112,8 +139,8 @@ function resize(){
   draw_canvas.y=0;
   draw_canvas.w=canvas.height;
   draw_canvas.h=canvas.height;
-  // places and sizes the draw_canvas in the current window
-  menu.x=(canvas.width-canvas.height)-canvas.height/1.42;
+  // places and sizes the menu in the current window
+  menu.x=0;//(canvas.width-canvas.height)-canvas.height/1.42;
   menu.y=0;
   menu.w=canvas.height/1.42;
   menu.h=canvas.height;
@@ -160,7 +187,18 @@ let temp = {x:0,y:0,w:0,h:0,col:[200,0,200],b_col:[80,80,80]}
   palettes.push(temp)
 }
 buttons = []
-bnames=['pencil','eraser','paint','undo','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','save','load','export']
+data=[]
+data = data_clear(grid_div)
+frames = []
+frame=0;
+frames.push(JSON.parse(JSON.stringify(data)))
+Hmirror=false;
+Vmirror=false;
+lockX = false;
+lockY = false;
+lastX = 0;
+lastY = 0;
+bnames=['pencil','eraser','paint','undo','Hmirror','Vmirror','clearColor','clearAll','up','lockX','lockY','frame0','button1','button1','down','new','button1','button1','save','load','export']
 for(let p = 0; p < 21; p++){
 let temp = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],text:bnames[p]}
   buttons.push(temp)
@@ -184,6 +222,12 @@ function draw_grid(){
   for(let x=left;x<right;x+=size){
     draw_line(x, top, x,bottom)
   }
+  //drawCross
+  draw_set_color(255,0,0)
+  let  cenX =left+draw_canvas.w/2;
+  let  cenY =top+draw_canvas.h/2;
+  draw_line(cenX, top, cenX,bottom)
+  draw_line(left, cenY, right, cenY)
   draw_set_linedash([])
 }
 function draw_draw_canvas(){
@@ -243,84 +287,108 @@ function button_getter(){
   }
   return index
 }
+
+function button_hiliter(){
+  for(let b = 0; b < buttons.length; b++){
+    let hlite=false
+    /**/
+  if(buttons[b].text=='Hmirror'&&Hmirror){hlite=true}
+  if(buttons[b].text=='Vmirror'&&Vmirror){hlite=true}
+  if(buttons[b].text=='pencil'&&tool==0){hlite=true}
+  if(buttons[b].text=='eraser'&&tool==1){hlite=true}
+  if(buttons[b].text=='paint'&&tool==2){hlite=true}
+  if(buttons[b].text=='clearColor'&&tool==3){hlite=true}
+  if(buttons[b].text=='lockX'&&lockX){hlite=true}
+  if(buttons[b].text=='lockY'&&lockY){hlite=true}
+    buttons[11].text=='frame'+frame;
+    
+    if(hlite){
+      buttons[b].col=[0,0,255] // hi lites
+    }else{
+      buttons[b].col=[255,255,255] // un hiltes
+    }
+  }
+}
+function roundDownToEven(num) {
+  return num % 2 === 0 ? num : num - 1;
+}
 function button_handler(but){
-  // alert(but)
-  if(but=='pencil'){
-    tool=0;
-    for(let b = 0; b < buttons.length; b++){
-      // sets all to regular
-      buttons[b].col=[255,255,255]
-      if( buttons[b].text=='pencil'){
-        buttons[b].col=[0,0,255] // hi lites pencil button
-      }
-    }
+  /**/
+  
+  // alert(but)Hmirror
+  if(but=='Hmirror'){
+  if(Hmirror){Hmirror=false}else{Hmirror=true}
   }
-  if(but=='eraser'){
-    tool=1;
-    for(let b = 0; b < buttons.length; b++){
-      // sets all to regular
-      buttons[b].col=[255,255,255]
-      if( buttons[b].text=='eraser'){
-        buttons[b].col=[0,0,255] // hi lites eraser button
-      }
-    }
+  if(but=='Vmirror'){
+  if(Vmirror){Vmirror=false}else{Vmirror=true}
   }
-  if(but=='paint'){
-    tool=2;
-    for(let b = 0; b < buttons.length; b++){
-      // sets all to regular
-      buttons[b].col=[255,255,255]
-      if( buttons[b].text=='paint'){
-        buttons[b].col=[0,0,255] // hi lites eraser button
-      }
-    }
+  
+  if(but=='lockX'){
+  if(lockX){lockX=false}else{lockX=true}
+  }
+  if(but=='lockY'){
+  if(lockY){lockY=false}else{lockY=true}
+  }
+if(but=='pencil'){tool=0}
+if(but=='eraser'){tool=1}
+if(but=='paint'){tool=2}
+if(but=='save'){save(); requestFullscreen(canvas);}
+if(but=='load'){load(); requestFullscreen(canvas);}
+if(but=='export'){saveRGBArrayAsPNG(frames[frame], parseInt(prompt('scaled by ',2))); requestFullscreen(canvas);}
+  if(but=='new'){
+    grid_div = roundDownToEven(parseInt(prompt('sprite_size?',16)))
+    reset(grid_div);
+    requestFullscreen(canvas);
+  }
+if(but=='clearColor'){tool=3}
+  if(but=='clearAll'){
+    frames[frame]=[]
+    frames[frame] = data_clear(grid_div)
   }
   if(but=='undo'){
     // if no undos exist return
   if(undo.length==0){return}
     // sets data to last undo
-    data=JSON.parse(JSON.stringify(undo[undo.length-1]))
+    frames[frame]=JSON.parse(JSON.stringify(undo[undo.length-1]))
     // removes last undo
     undo.splice(undo.length-1,1)
   }
-  if(but=='save'){save()}
-  if(but=='load'){load()}
-  
+  button_hiliter();
 }
 function paintFill(cellX, cellY, newColor) {
-    const rows = data.length;
-    const cols = data[0].length;
-    const oldColor = data[cellY][cellX];
-
-    // If the new color is the same as the old color, no need to fill
-    if (arraysEqual(oldColor, newColor)) return;
-
-    function arraysEqual(a, b) {
-        return a.length === b.length && a.every((val, index) => val === b[index]);
-    }
-
-    function floodFill(x, y) {
-        // Check boundaries
-        if (x < 0 || y < 0 || x >= cols || y >= rows) return;
-        // Check if the cell is the same color as the original
-        if (!arraysEqual(data[y][x], oldColor)) return;
-
-        // Set new color
-        data[y][x] = newColor;
-
-        // Recursively fill neighbors
-        floodFill(x + 1, y);
-        floodFill(x - 1, y);
-        floodFill(x, y + 1);
-        floodFill(x, y - 1);
-    }
-
-    floodFill(cellX, cellY);
+  const rows = frames[frame].length;
+  const cols = frames[frame][0].length;
+  const oldColor = frames[frame][cellY][cellX];
+  
+  // If the new color is the same as the old color, no need to fill
+  if (arraysEqual(oldColor, newColor)) return;
+  
+  function arraysEqual(a, b) {
+    return a.length === b.length && a.every((val, index) => val === b[index]);
+  }
+  
+  function floodFill(x, y) {
+    // Check boundaries
+    if (x < 0 || y < 0 || x >= cols || y >= rows) return;
+    // Check if the cell is the same color as the original
+    if (!arraysEqual(frames[frame][y][x], oldColor)) return;
+    
+    // Set new color
+    frames[frame][y][x] = newColor;
+    
+    // Recursively fill neighbors
+    floodFill(x + 1, y);
+    floodFill(x - 1, y);
+    floodFill(x, y + 1);
+    floodFill(x, y - 1);
+  }
+  
+  floodFill(cellX, cellY);
 }
 function save(){
 //let project = {}
-//  project.spriteWidth = spriteWidth;
-//  project.layers = JSON.parse(JSON.stringify(layers))
+  //  project.spriteWidth = spriteWidth;
+  // project.layers = JSON.parse(JSON.stringify(layers))
   var content = JSON.stringify(data)
 const blob = new Blob([content], { type: "text/json" }); // Create a Blob object with the JS content
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
@@ -339,22 +407,23 @@ function load(){
       const reader = new FileReader();
       reader.onload = function(e) {
         const fileContent = e.target.result;
-        data=[];
-        data = JSON.parse(fileContent);
-        document.getElementById('fileInput').value=''
-        // Display as string
-       // spriteWidth = project.spriteWidth;
-      //  layers = [];
-      //  layers = project.layers;
-      //  layerCanvases = [];
-       // for(let i = 0; i < layers.length; i ++){
-      //    layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
-      //    updateLayerCanvas(i)
-      //  }
+        frames[frame] = JSON.parse(fileContent);  // Display as string
+        grid_div=frames[frame].length
+        //reset(grid_div);
+        /*
+        spriteWidth = project.spriteWidth;
+        layers = [];
+        layers = project.layers;
+        layerCanvases = [];
+        for(let i = 0; i < layers.length; i ++){
+          layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
+          updateLayerCanvas(i)
+        }
         
-       // layer = 0;
-      //  data = JSON.parse(JSON.stringify(layers[layer]))
-      //  draw_data(data)
+        layer = 0;
+        data = JSON.parse(JSON.stringify(layers[layer]))
+        draw_data(data)
+        */
       };
       reader.readAsText(file);  // Read the file content as text
     } else {
@@ -397,6 +466,69 @@ function draw(){
   data_draw();
   draw_grid();
 }
+
+function saveRGBArrayAsPNG(rgbArray, scale = 1) {
+  if (!Array.isArray(rgbArray) || rgbArray.length === 0) {
+    console.error("Invalid RGB array.");
+    return;
+  }
+  
+  const height = rgbArray.length;
+  const width = rgbArray[0].length;
+  
+  // Ensure scale is a positive integer
+  scale = Math.max(1, Math.floor(scale));
+  
+  // Calculate new dimensions
+  const newWidth = width * scale;
+  const newHeight = height * scale;
+  
+  // Create a temporary canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = newWidth;
+  canvas.height = newHeight;
+  const ctx = canvas.getContext("2d");
+  const imageData = ctx.createImageData(newWidth, newHeight);
+  const data = imageData.data;
+  
+  // Fill the image data with scaled pixel values
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const [r, g, b] = rgbArray[y][x];
+      
+      // Handle transparency
+      const alpha = (r === -1 && g === -1 && b === -1) ? 0 : 255;
+      
+      // Scale up each pixel into the new array
+      for (let dy = 0; dy < scale; dy++) {
+        for (let dx = 0; dx < scale; dx++) {
+          const newX = x * scale + dx;
+          const newY = y * scale + dy;
+          const index = (newY * newWidth + newX) * 4;
+          
+          data[index] = r === -1 ? 0 : r; // Red
+          data[index + 1] = g === -1 ? 0 : g; // Green
+          data[index + 2] = b === -1 ? 0 : b; // Blue
+          data[index + 3] = alpha; // Alpha
+        }
+      }
+    }
+  }
+  
+  // Put image data onto the canvas
+  ctx.putImageData(imageData, 0, 0);
+  
+  // Convert canvas to PNG and trigger download
+  canvas.toBlob(blob => {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "output.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, "image/png");
+}
+
 
 
 
