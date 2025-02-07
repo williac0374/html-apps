@@ -27,8 +27,11 @@ canvas {
 
 <script>
 grid_div=0
+tool=0
+undo=[]
 function reset(px_width){
   size=2;
+  undo=[]
   grid_div=px_width;
   color_index = -1;
   color_palette = [
@@ -51,7 +54,7 @@ function data_clear(sw){
   for (let y = 0; y < sw; y++) {
     var row = [];
     for (let x = 0; x < sw; x++) {
-      row.push([20,20,20]);
+      row.push([-1,-1,-1]);
     }
     temp.push(row);
   };
@@ -69,7 +72,12 @@ function data_entry(){
     if(mx>left&&mx<right&&my>top&&my<bottom){ // mouse is over draw_canvas
       let cellX = floor((mx-left)/size)
       let cellY = floor((my-top)/size)
-      data[cellY][cellX]=color
+      if(tool==0){//pencil
+        data[cellY][cellX]=color
+      }
+      if(tool==1){//eraser
+        data[cellY][cellX]=[-1,-1,-1]
+      }
     }
     
   }
@@ -148,7 +156,7 @@ let temp = {x:0,y:0,w:0,h:0,col:[200,0,200],b_col:[80,80,80]}
   palettes.push(temp)
 }
 buttons = []
-bnames=['button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1']
+bnames=['pencil','eraser','paint','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1']
 for(let p = 0; p < 21; p++){
 let temp = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],text:bnames[p]}
   buttons.push(temp)
@@ -198,7 +206,7 @@ function draw_draw_canvas(){
     draw_set_color(255,255,255)
     draw_centered_text(buttons[b].x+buttons[b].w/2, buttons[b].y+buttons[b].h/2, buttons[b].text, buttons[b].h/3, 400)
   }
- 
+  
 }
 function palette_handler(){
   let index = -1
@@ -232,8 +240,27 @@ function button_getter(){
   return index
 }
 function button_handler(but){
- // alert(but)
-  if(but=='fullscreen'){requestFullscreen(canvas)}
+  // alert(but)
+  if(but=='pencil'){
+    tool=0;
+    for(let b = 0; b < buttons.length; b++){
+      // sets all to regular
+      buttons[b].col=[255,255,255]
+      if( buttons[b].text=='pencil'){
+        buttons[b].col=[0,0,255] // hi lites pencil button
+      }
+    }
+  }
+  if(but=='eraser'){
+    tool=1;
+    for(let b = 0; b < buttons.length; b++){
+      // sets all to regular
+      buttons[b].col=[255,255,255]
+      if( buttons[b].text=='eraser'){
+        buttons[b].col=[0,0,255] // hi lites eraser button
+      }
+    }
+  }
 }
 function start(){
   
@@ -256,7 +283,9 @@ function loop(){
     }
     
   }
-  
+  if(mouse_check_released()){
+    alert('upsies!!!!!')
+  }
   
   
 }
@@ -264,7 +293,7 @@ function loop(){
 function draw(){
   draw_draw_canvas();
   data_draw();
-   draw_grid();
+  draw_grid();
 }
 
 
