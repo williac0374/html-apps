@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>level_Play_tester</title>
+<title>slowDraw</title>
 <style>
 body{
   margin: 0;
@@ -23,6 +23,7 @@ canvas {
 </head>
 
 <body>
+  <input type="file" id="fileInput" accept=".json" style="display:none">
 <canvas id="canvas"></canvas>
 
 <script>
@@ -77,6 +78,9 @@ function data_entry(){
       }
       if(tool==1){//eraser
         data[cellY][cellX]=[-1,-1,-1]
+      }
+      if(tool==2){//paint
+        paintFill(cellX, cellY, color)
       }
     }
     
@@ -156,7 +160,7 @@ let temp = {x:0,y:0,w:0,h:0,col:[200,0,200],b_col:[80,80,80]}
   palettes.push(temp)
 }
 buttons = []
-bnames=['pencil','eraser','paint','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1']
+bnames=['pencil','eraser','paint','undo','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','save','load','export']
 for(let p = 0; p < 21; p++){
 let temp = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],text:bnames[p]}
   buttons.push(temp)
@@ -261,7 +265,105 @@ function button_handler(but){
       }
     }
   }
+  if(but=='paint'){
+    tool=2;
+    for(let b = 0; b < buttons.length; b++){
+      // sets all to regular
+      buttons[b].col=[255,255,255]
+      if( buttons[b].text=='paint'){
+        buttons[b].col=[0,0,255] // hi lites eraser button
+      }
+    }
+  }
+  if(but=='undo'){
+    // if no undos exist return
+  if(undo.length==0){return}
+    // sets data to last undo
+    data=JSON.parse(JSON.stringify(undo[undo.length-1]))
+    // removes last undo
+    undo.splice(undo.length-1,1)
+  }
+  if(but=='save'){save()}
+  if(but=='load'){load()}
+  
 }
+function paintFill(cellX, cellY, newColor) {
+    const rows = data.length;
+    const cols = data[0].length;
+    const oldColor = data[cellY][cellX];
+
+    // If the new color is the same as the old color, no need to fill
+    if (arraysEqual(oldColor, newColor)) return;
+
+    function arraysEqual(a, b) {
+        return a.length === b.length && a.every((val, index) => val === b[index]);
+    }
+
+    function floodFill(x, y) {
+        // Check boundaries
+        if (x < 0 || y < 0 || x >= cols || y >= rows) return;
+        // Check if the cell is the same color as the original
+        if (!arraysEqual(data[y][x], oldColor)) return;
+
+        // Set new color
+        data[y][x] = newColor;
+
+        // Recursively fill neighbors
+        floodFill(x + 1, y);
+        floodFill(x - 1, y);
+        floodFill(x, y + 1);
+        floodFill(x, y - 1);
+    }
+
+    floodFill(cellX, cellY);
+}
+function save(){
+//let project = {}
+//  project.spriteWidth = spriteWidth;
+//  project.layers = JSON.parse(JSON.stringify(layers))
+  var content = JSON.stringify(data)
+const blob = new Blob([content], { type: "text/json" }); // Create a Blob object with the JS content
+  const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "picture.json"; // Set the filename
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+function load(){
+  document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fileContent = e.target.result;
+        data=[];
+        data = JSON.parse(fileContent);
+        document.getElementById('fileInput').value=''
+        // Display as string
+       // spriteWidth = project.spriteWidth;
+      //  layers = [];
+      //  layers = project.layers;
+      //  layerCanvases = [];
+       // for(let i = 0; i < layers.length; i ++){
+      //    layerCanvases.push(createOffscreenCanvas(spriteWidth, spriteWidth))
+      //    updateLayerCanvas(i)
+      //  }
+        
+       // layer = 0;
+      //  data = JSON.parse(JSON.stringify(layers[layer]))
+      //  draw_data(data)
+      };
+      reader.readAsText(file);  // Read the file content as text
+    } else {
+      alert('Please select a valid JSON file');
+    }
+  });
+  document.getElementById('fileInput').click();
+}
+
 function start(){
   
 }
@@ -284,7 +386,7 @@ function loop(){
     
   }
   if(mouse_check_released()){
-    alert('upsies!!!!!')
+    undo.push(JSON.parse(JSON.stringify(data)))
   }
   
   
