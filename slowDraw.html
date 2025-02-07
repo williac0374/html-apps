@@ -148,7 +148,7 @@ let temp = {x:0,y:0,w:0,h:0,col:[200,0,200],b_col:[80,80,80]}
   palettes.push(temp)
 }
 buttons = []
-bnames=['button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','fullscreen','button1','button1']
+bnames=['button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1','button1']
 for(let p = 0; p < 21; p++){
 let temp = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],text:bnames[p]}
   buttons.push(temp)
@@ -211,7 +211,8 @@ function palette_handler(){
     let bottom = palettes[p].y+size;
     if(mouse_x>left&&mouse_x<right&&mouse_y>top&&mouse_y<bottom){
       index= p;
-      palettes[p].b_col=[255,255,255]
+      palettes[p].b_col=[255,255,255];
+      requestFullscreen(canvas);
     }
   }
   // returns palette index to use in assigning palette color
