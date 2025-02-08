@@ -27,8 +27,11 @@ canvas {
 <canvas id="canvas"></canvas>
 
 <script>
+frame_delay=200
+setTimeout(function(){frames_animator()},frame_delay)
 grid_div=0
 tool=0
+animate=false
 undo=[]
 function reset(px_width){
   size=2;
@@ -52,7 +55,7 @@ function reset(px_width){
   frame=0;
   frames.push(JSON.parse(JSON.stringify(data)))
   //alert(frames[frame].length)
-  
+  animate=false
   Hmirror=false;
   Vmirror=false;
   lockX = false;
@@ -61,6 +64,33 @@ function reset(px_width){
   lastY = 0;
 }
 reset(16)
+function up_frame(){
+  if(frame==frames.length-1){ // already the top frame
+    // make a new frame and show it
+  if(confirm('create new frame?')){ make_frame() }
+  }else{
+    frame++
+  }
+}
+function down_frame(){
+if(frame>0){frame--}
+}
+
+function copy_up(){
+  let temp = JSON.parse(JSON.stringify(frames[frame]))
+  if(frame==frames.length-1){//  already top layer
+    frames.push(JSON.parse(JSON.stringify(temp)))// push current content to a new layer
+    frame++
+  }else{
+    frame++
+    frames[frame]=JSON.parse(JSON.stringify(temp))
+  }
+}
+function make_frame(){
+  let temp = data_clear(grid_div)
+  frames.push(JSON.parse(JSON.stringify(temp)))
+  frame++
+}
 function data_clear(sw){
   let temp = []
   for (let y = 0; y < sw; y++) {
@@ -117,6 +147,20 @@ function data_draw(){
 if(frames.length==0){return}
   for (let y = 0; y < frames[frame].length; y++) {
     for (let x = 0; x < frames[frame].length; x++) {
+      if(frame>0){
+        if(frames[frame-1][y][x][0]!=-1){
+          if(grid_div!=0){
+            let size = (draw_canvas.w-8)/grid_div
+            let r = frames[frame-1][y][x][0];
+            let g = frames[frame-1][y][x][1];
+            let b = frames[frame-1][y][x][2];
+            draw_set_color(r,g,b)
+            draw_set_alpha(0.3)
+            draw_rectangle(draw_canvas.x+4+x*size, draw_canvas.y+4+y*size, size, size,false,0,0,0)
+            draw_set_alpha(1)
+          }
+        }
+      }
       if(frames[frame][y][x][0]!=-1){
         if(grid_div!=0){
           let size = (draw_canvas.w-8)/grid_div
@@ -192,13 +236,14 @@ data = data_clear(grid_div)
 frames = []
 frame=0;
 frames.push(JSON.parse(JSON.stringify(data)))
+onion=false
 Hmirror=false;
 Vmirror=false;
 lockX = false;
 lockY = false;
 lastX = 0;
 lastY = 0;
-bnames=['pencil','eraser','paint','undo','Hmirror','Vmirror','clearColor','clearAll','up','lockX','lockY','frame0','button1','button1','down','new','button1','button1','save','load','export']
+bnames=['pencil','eraser','paint','undo','Hmirror','Vmirror','clearColor','clearAll','up','lockX','lockY','frame0','copy_up','onion','down','new','animate','frame_delay','save','load','export']
 for(let p = 0; p < 21; p++){
 let temp = {x:0,y:0,w:0,h:0,col:[255,255,255],b_col:[0,0,0],text:bnames[p]}
   buttons.push(temp)
@@ -300,13 +345,19 @@ function button_hiliter(){
   if(buttons[b].text=='clearColor'&&tool==3){hlite=true}
   if(buttons[b].text=='lockX'&&lockX){hlite=true}
   if(buttons[b].text=='lockY'&&lockY){hlite=true}
-    buttons[11].text=='frame'+frame;
+  if(buttons[b].text=='onion'&&onion){hlite=true}
+  if(buttons[b].text=='animate'&&animate){hlite=true}
+    
+    
+    
+    
     
     if(hlite){
       buttons[b].col=[0,0,255] // hi lites
     }else{
       buttons[b].col=[255,255,255] // un hiltes
     }
+    buttons[11].text='framed'+frame;
   }
 }
 function roundDownToEven(num) {
@@ -319,8 +370,18 @@ function button_handler(but){
   if(but=='Hmirror'){
   if(Hmirror){Hmirror=false}else{Hmirror=true}
   }
+  if(but=='frame_delay'){
+    frame_delay=parseInt(prompt('frame_delay?',frame_delay))
+  }
+  
   if(but=='Vmirror'){
   if(Vmirror){Vmirror=false}else{Vmirror=true}
+  }
+  if(but=='onion'){
+  if(onion){onion=false}else{onion=true}
+  }
+  if(but=='animate'){
+  if(animate){animate=false;}else{animate=true}
   }
   
   if(but=='lockX'){
@@ -334,7 +395,7 @@ if(but=='eraser'){tool=1}
 if(but=='paint'){tool=2}
 if(but=='save'){save(); requestFullscreen(canvas);}
 if(but=='load'){load(); requestFullscreen(canvas);}
-if(but=='export'){saveRGBArrayAsPNG(frames[frame], parseInt(prompt('scaled by ',2))); requestFullscreen(canvas);}
+if(but=='export'){saveRGBArrayAsPNG(frames, parseInt(prompt('scaled by ',2))); requestFullscreen(canvas);}
   if(but=='new'){
     grid_div = roundDownToEven(parseInt(prompt('sprite_size?',16)))
     reset(grid_div);
@@ -353,6 +414,10 @@ if(but=='clearColor'){tool=3}
     // removes last undo
     undo.splice(undo.length-1,1)
   }
+if(but=='up'){up_frame()}
+if(but=='down'){down_frame()}
+if(but=='copy_up'){copy_up()}
+  document.title=frame
   button_hiliter();
 }
 function paintFill(cellX, cellY, newColor) {
@@ -386,10 +451,10 @@ function paintFill(cellX, cellY, newColor) {
   floodFill(cellX, cellY);
 }
 function save(){
-//let project = {}
-  //  project.spriteWidth = spriteWidth;
-  // project.layers = JSON.parse(JSON.stringify(layers))
-  var content = JSON.stringify(data)
+let project = {}
+  project.grid_div = grid_div;
+  project.frames = JSON.parse(JSON.stringify(frames))
+  var content = JSON.stringify(project)
 const blob = new Blob([content], { type: "text/json" }); // Create a Blob object with the JS content
   const url = URL.createObjectURL(blob); // Create a URL for the Blob
   const link = document.createElement("a");
@@ -407,8 +472,11 @@ function load(){
       const reader = new FileReader();
       reader.onload = function(e) {
         const fileContent = e.target.result;
-        frames[frame] = JSON.parse(fileContent);  // Display as string
-        grid_div=frames[frame].length
+      let project = {}
+        project = JSON.parse(fileContent);  // Display as string
+        grid_div = project.grid_div
+        frames = JSON.parse(JSON.stringify(project.frames))
+        
         //reset(grid_div);
         /*
         spriteWidth = project.spriteWidth;
@@ -437,7 +505,13 @@ function start(){
   
 }
 
-
+function frames_animator(){
+  if(animate){
+    frame++;
+  if(frame==frames.length){frame=0}
+  }
+setTimeout(function(){frames_animator()},frame_delay)
+}
 function loop(){
   if(mouse_check()){
     if(mouse_x<menu.x+menu.w){
@@ -468,13 +542,9 @@ function draw(){
 }
 
 function saveRGBArrayAsPNG(rgbArray, scale = 1) {
-  if (!Array.isArray(rgbArray) || rgbArray.length === 0) {
-    console.error("Invalid RGB array.");
-    return;
-  }
   
-  const height = rgbArray.length;
-  const width = rgbArray[0].length;
+  const height = rgbArray[0].length;
+  const width = rgbArray[0][0].length;
   
   // Ensure scale is a positive integer
   scale = Math.max(1, Math.floor(scale));
@@ -485,39 +555,39 @@ function saveRGBArrayAsPNG(rgbArray, scale = 1) {
   
   // Create a temporary canvas
   const canvas = document.createElement("canvas");
-  canvas.width = newWidth;
+  canvas.width = newWidth*(frames.length);
   canvas.height = newHeight;
   const ctx = canvas.getContext("2d");
   const imageData = ctx.createImageData(newWidth, newHeight);
   const data = imageData.data;
-  
-  // Fill the image data with scaled pixel values
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const [r, g, b] = rgbArray[y][x];
-      
-      // Handle transparency
-      const alpha = (r === -1 && g === -1 && b === -1) ? 0 : 255;
-      
-      // Scale up each pixel into the new array
-      for (let dy = 0; dy < scale; dy++) {
-        for (let dx = 0; dx < scale; dx++) {
-          const newX = x * scale + dx;
-          const newY = y * scale + dy;
-          const index = (newY * newWidth + newX) * 4;
-          
-          data[index] = r === -1 ? 0 : r; // Red
-          data[index + 1] = g === -1 ? 0 : g; // Green
-          data[index + 2] = b === -1 ? 0 : b; // Blue
-          data[index + 3] = alpha; // Alpha
+  for (let f = 0; f < frames.length; f++) {
+    // Fill the image data with scaled pixel values
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const [r, g, b] = rgbArray[f][y][x];
+        
+        // Handle transparency
+        const alpha = (r === -1 && g === -1 && b === -1) ? 0 : 255;
+        
+        // Scale up each pixel into the new array
+        for (let dy = 0; dy < scale; dy++) {
+          for (let dx = 0; dx < scale; dx++) {
+            const newX = x * scale + dx;
+            const newY = y * scale + dy;
+            const index = (newY * newWidth + newX) * 4;
+            
+            data[index] = r === -1 ? 0 : r; // Red
+            data[index + 1] = g === -1 ? 0 : g; // Green
+            data[index + 2] = b === -1 ? 0 : b; // Blue
+            data[index + 3] = alpha; // Alpha
+          }
         }
       }
     }
+    
+    // Put image data onto the canvas
+    ctx.putImageData(imageData, f*newHeight, 0);
   }
-  
-  // Put image data onto the canvas
-  ctx.putImageData(imageData, 0, 0);
-  
   // Convert canvas to PNG and trigger download
   canvas.toBlob(blob => {
     const link = document.createElement("a");
