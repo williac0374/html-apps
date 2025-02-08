@@ -1,6 +1,6 @@
 {
-  "name": "My HTML Game",
-  "short_name": "Game",
+  "name": "SlowDraw",
+  "short_name": "SlowDraw",
   "start_url": "./slowDraw.html",
   "display": "standalone",
   "background_color": "#000000",
