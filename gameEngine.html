@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gameEngine</title>
+<style>
+body{
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  
+}
+canvas {
+  // border: 2px solid #000;
+  background-color: white;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+function start(){
+  
+}
+function loop(){
+  keys=[]
+  for(let k = 0; k<key_down.length;k++){if(key_down[k]){keys.push(k)}}
+  document.title=JSON.stringify(pointer)+' , '+JSON.stringify(keys)
+ if(keys.includes(32)){document.title='space'}
+}
+canvas = document.getElementById('canvas');
+ctx = canvas.getContext("2d");
+function resizeCanvas() {
+  var WIDTH = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+  var HEIGHT = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  canvas.width=WIDTH;
+  canvas.height=HEIGHT;
+}
+window.onresize = function() {resizeCanvas()};
+setTimeout(function(){resizeCanvas()},100);
+key_down = []
+function kDown(e){if(e.repeat){return;}var keyCode = e.keyCode;key_down[keyCode] = true;}
+function kUp(e){var keyCode = e.keyCode;key_down[keyCode] = false;}
+pointer={x:0,y:0,left:false,right:false}
+function mDown(e){if(e.button == 2){pointer.right=true}else{pointer.left=true}}
+function mUp(e){if(e.button == 2){pointer.right=false}else{pointer.left=false}}
+function mMove(e){let x, y;if(e.touches){x=e.touches[0].clientX;y=e.touches[0].clientY;}else if(e.pageX!=undefined&&e.pageY!=undefined){x=e.pageX;y=e.pageY} else{x=e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;y=e.clientY + document.body.scrollTop + document.documentElement.scrollTop}
+var rect = canvas.getBoundingClientRect();let scaleX = canvas.width / rect.width;let scaleY=canvas.height/rect.height;pointer.x = (x - canvas.offsetLeft)* scaleX;pointer.y = (y - canvas.offsetTop)* scaleY;e.preventDefault();}
+function touchStart(e){mMove(e);mDown()}
+function touchEnd(e){mUp();}
+addEventListener("keydown",kDown, false);//16 is shift e.keyCode;
+addEventListener("keyup",kUp, false);
+addEventListener("mousedown",mDown,false);
+addEventListener("mouseup",mUp,false);
+addEventListener("mousemove",mMove,false);
+addEventListener('wheel',wheel,false);
+// Add touch event listeners with { passive: false }
+addEventListener("touchstart",touchStart, { passive: false });
+addEventListener("touchend",touchEnd, { passive: false });
+addEventListener("touchmove",mMove, { passive: false });
+addEventListener('contextmenu',function(event) {event.preventDefault()});
+function wheel(e){if(e.deltaY<0){wheelDir++}else{wheelDir--}};
+// The main game loop
+FPS = [];fps=0;
+function main(){var now = Date.now();var delta = now - then;timeShift = delta / 1000;FPS.push(Math.floor(1/timeShift));if(FPS.length>10){let temp=0;for(let f = 0;f<FPS.length;f++){temp+=FPS[f]}fps = Math.floor(temp/FPS.length);FPS = [];};ctx.clearRect(0, 0, canvas.width, canvas.height);loop();then = now;requestAnimationFrame(main);};
+// Cross-browser support for requestAnimationFrame
+var w = window;
+requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+// Let's play this game!
+var then = Date.now();
+start();
+main();
+</script>
+</body>
+</html>
