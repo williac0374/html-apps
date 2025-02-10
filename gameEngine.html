@@ -27,11 +27,28 @@ function start(){
   
 }
 function loop(){
-  keys=[]
-  for(let k = 0; k<key_down.length;k++){if(key_down[k]){keys.push(k)}}
-  document.title=JSON.stringify(pointer)+' , '+JSON.stringify(keys)
- if(keys.includes(32)){document.title='space'}
+draw_rectangle(pointer.x, pointer.y, 64, 64,false,0,0,0)
+  if(pointer.left){ctx.fillStyle = "#ff00ff";}else{ctx.fillStyle = "#ff0000";}
 }
+function draw_rectangle(x, y, w, h,outline,rot,ox,oy) {
+  ctx.globalAlpha =1;
+  if(rot!=null){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(rot*Math.PI/180);
+    ctx.beginPath();
+    if (outline) ctx.strokeRect( -ox,-oy,w,h);
+    else ctx.fillRect( -ox,-oy,w,h );
+    ctx.closePath();
+    ctx.restore()
+  }else{
+    ctx.beginPath();
+    if (outline) ctx.strokeRect( x,y,w,h);
+    else ctx.fillRect( x,y,w,h );
+    ctx.closePath()
+  }
+}
+
 canvas = document.getElementById('canvas');
 ctx = canvas.getContext("2d");
 function resizeCanvas() {
