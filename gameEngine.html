@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>gameEngine</title>
@@ -20,18 +21,22 @@ canvas {
   background-color: white;
 }
 </style>
+
 </head>
 <body>
+<!--  <script src="assets.js"></script>  -->
 <canvas id="canvas"></canvas>
 <script>
-  first=true
+ var palette = ['#be4a2f','#d77643','#ead4aa','#e4a672','#b86f50','#733e39','#3e2731','#a22633','#e43b44','#f77622','#feae34','#fee761','#63c74d','#3e8948','#265c42','#193c3e','#124e89','#0099db','#2ce8f5','#ffffff','#c0cbdc','#8b9bb4','#5a6988','#3a4466','#262b44','#181425','#ff0044','#68386c','#b55088','#f6757a','#e8b796','#c28569']; 
+first=true
 //ctx.fillStyle = "#ff00ff";ctx.strokeStyle = "#ff00ff";ctx.globalAlpha =1;
-   W = 0;
-  H = 0; 
+W = 0;
+H = 0;
 function start(){
 if(!first){return}
   first=false;
   blocks = [];
+  from=null;
   let y = 0;
   let x = 0;
   let percent = 25;
@@ -42,23 +47,63 @@ if(!first){return}
       y:y*size,
       w:size,
       h:size,
-      col:randCol()
+      col:palette[Math.round(Math.random()*palette.length)],
+      tapped:false,
+      hilite:false,
+      kill:false,
     }
     blocks.push(temp)
     x+=1
-    if(x==percent){x=0;y+=1}
+  if(x==percent){x=0;y+=1}
   }
 }
 function loop(){
-  for(let b = 0 ; b < blocks.length; b++){
-    ctx.fillStyle=blocks[b].col;
-    draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,false,0,0,0)
-   
-  }
-if(pointer.left){ctx.fillStyle = randCol();randCol()}else{ctx.fillStyle = "#ff0000";}
+  object_handler();
+  document.title = pointer.left
 }
 
 
+function object_handler(){
+  for(let b = blocks.length-1;b>=0;b--){
+    ctx.fillStyle=blocks[b].col;
+    draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,false,0,0,0)
+    if(tap(blocks[b])){
+      if(from==null){
+        from=b
+        blocks[b].hilite=true;
+      }else{
+        blocks[b].hilite=true
+        let toX = blocks[b].x;
+        let toY = blocks[b].y;
+        let fromX = blocks[from].x;
+        let fromY = blocks[from].y;
+        blocks[b].x=fromX;
+        blocks[b].y=fromY;
+        blocks[from].x=toX;
+        blocks[from].y=toY;
+        let f = from
+        setTimeout(function(){blocks[f].hilite=false;blocks[b].hilite=false;},50);
+        
+        from=null;
+      }
+      
+      pointer.left=false;
+    }
+    if(blocks[b].kill){
+      blocks.splice(b,1)
+    }
+    if(blocks[b].hilite){
+      ctx.lineWidth = 4;
+      ctx.strokeStyle=palette[19];//white
+      ctx.setLineDash([6,2]);
+      draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,true,0,0,0)
+      ctx.lineWidth = 1;
+      ctx.setLineDash([]);
+    }
+    
+  }
+}
+function tap(obj){let x=pointer.x;let y=pointer.y;let l=obj.x;let r=obj.x+obj.w;let t=obj.y;let b=obj.y+obj.h;if(x>l&&x<r&&y>t&&y<b&&pointer.left){return true;}else{return false;}}
 function pX(x){return Math.round(W*(x/100));}function pY(y){return Math.round(H*(y/100));}
 function randCol(){let output = '#';for(let i=0;i<6;i++){let t = Math.round(Math.random()*16);let h = t.toString();if(t==11){h='a'};if(t==12){h='b'};if(t==13){h='c'};if(t==14){h='d'};if(t==15){h='e'};if(t==16){h='f'}output+=h;}return output;}
 function draw_rectangle(x, y, w, h,outline,rot,ox,oy) {if(rot!=null){ctx.save();ctx.translate(x,y);ctx.rotate(rot*Math.PI/180);ctx.beginPath();if (outline) ctx.strokeRect( -ox,-oy,w,h);else ctx.fillRect( -ox,-oy,w,h );ctx.closePath();ctx.restore()}else{ctx.beginPath();if (outline) ctx.strokeRect( x,y,w,h);else ctx.fillRect( x,y,w,h );ctx.closePath()}}
