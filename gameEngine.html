@@ -41,7 +41,7 @@ if(!first){return}
   let x = 0;
   let percent = 25;
   let size = pX(percent)
-  for(let i = 0; i<300; i++){
+  for(let i = 0; i<32; i++){
     let temp = {
       x:x*size,
       y:y*size,
@@ -54,7 +54,7 @@ if(!first){return}
     }
     blocks.push(temp)
     x+=1
-  if(x==percent){x=0;y+=1}
+  if(x>=100/percent){x=0;y+=1}
   }
 }
 function loop(){
@@ -68,6 +68,7 @@ function object_handler(){
     ctx.fillStyle=blocks[b].col;
     draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,false,0,0,0)
     if(tap(blocks[b])){
+      
       if(from==null){
         from=b
         blocks[b].hilite=true;
