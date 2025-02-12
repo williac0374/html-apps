@@ -59,7 +59,6 @@ if(!first){return}
 }
 function loop(){
   object_handler();
-  document.title = pointer.left
 }
 
 
@@ -94,7 +93,7 @@ function object_handler(){
       blocks.splice(b,1)
     }
     if(blocks[b].hilite){
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 8;
       ctx.strokeStyle=palette[19];//white
       ctx.setLineDash([6,2]);
       draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,true,0,0,0)
