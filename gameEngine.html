@@ -15,7 +15,8 @@ body{
   
 }
 canvas {
-  // border: 2px solid #000;
+  display: block;
+  image-rendering: pixelated; /* Prevents anti-aliasing effects */
   background-color: white;
 }
 </style>
@@ -23,40 +24,48 @@ canvas {
 <body>
 <canvas id="canvas"></canvas>
 <script>
+  first=true
+//ctx.fillStyle = "#ff00ff";ctx.strokeStyle = "#ff00ff";ctx.globalAlpha =1;
+   W = 0;
+  H = 0; 
 function start(){
-  
-}
-function loop(){
-draw_rectangle(120, 120, 64, 64,false,0,0,0)
-  if(pointer.left){ctx.fillStyle = "#ff00ff";}else{ctx.fillStyle = "#ff0000";}
-}
-function draw_rectangle(x, y, w, h,outline,rot,ox,oy) {
-  ctx.globalAlpha =1;
-  if(rot!=null){
-    ctx.save();
-    ctx.translate(x,y);
-    ctx.rotate(rot*Math.PI/180);
-    ctx.beginPath();
-    if (outline) ctx.strokeRect( -ox,-oy,w,h);
-    else ctx.fillRect( -ox,-oy,w,h );
-    ctx.closePath();
-    ctx.restore()
-  }else{
-    ctx.beginPath();
-    if (outline) ctx.strokeRect( x,y,w,h);
-    else ctx.fillRect( x,y,w,h );
-    ctx.closePath()
+if(!first){return}
+  first=false;
+  blocks = [];
+  let y = 0;
+  let x = 0;
+  let percent = 25;
+  let size = pX(percent)
+  for(let i = 0; i<300; i++){
+    let temp = {
+      x:x*size,
+      y:y*size,
+      w:size,
+      h:size,
+      col:randCol()
+    }
+    blocks.push(temp)
+    x+=1
+    if(x==percent){x=0;y+=1}
   }
 }
+function loop(){
+  for(let b = 0 ; b < blocks.length; b++){
+    ctx.fillStyle=blocks[b].col;
+    draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,false,0,0,0)
+   
+  }
+if(pointer.left){ctx.fillStyle = randCol();randCol()}else{ctx.fillStyle = "#ff0000";}
+}
 
+
+function pX(x){return Math.round(W*(x/100));}function pY(y){return Math.round(H*(y/100));}
+function randCol(){let output = '#';for(let i=0;i<6;i++){let t = Math.round(Math.random()*16);let h = t.toString();if(t==11){h='a'};if(t==12){h='b'};if(t==13){h='c'};if(t==14){h='d'};if(t==15){h='e'};if(t==16){h='f'}output+=h;}return output;}
+function draw_rectangle(x, y, w, h,outline,rot,ox,oy) {if(rot!=null){ctx.save();ctx.translate(x,y);ctx.rotate(rot*Math.PI/180);ctx.beginPath();if (outline) ctx.strokeRect( -ox,-oy,w,h);else ctx.fillRect( -ox,-oy,w,h );ctx.closePath();ctx.restore()}else{ctx.beginPath();if (outline) ctx.strokeRect( x,y,w,h);else ctx.fillRect( x,y,w,h );ctx.closePath()}}
 canvas = document.getElementById('canvas');
 ctx = canvas.getContext("2d");
-function resizeCanvas() {
-  var WIDTH = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-  var HEIGHT = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  canvas.width=WIDTH;
-  canvas.height=HEIGHT;
-}
+function resizeCanvas() {if(detectDevice()=='mobile'){W = window.visualViewport ? window.visualViewport.width : window.innerWidth;H = window.visualViewport ? window.visualViewport.height : window.innerHeight;}else{H = window.visualViewport ? window.visualViewport.height : window.innerHeight;W = H/2;}canvas.width=W;canvas.height=H;start();main();}
+function detectDevice() {const userAgent = navigator.userAgent || navigator.vendor || window.opera;if (/android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase())) {return "mobile";}return "desktop";}
 window.onresize = function() {resizeCanvas()};
 setTimeout(function(){resizeCanvas()},100);
 key_down = []
@@ -64,7 +73,6 @@ function kDown(e){if(e.repeat){return;}var keyCode = e.keyCode;key_down[keyCode]
 function kUp(e){var keyCode = e.keyCode;key_down[keyCode] = false;}
 pointer={x:0,y:0,left:false,right:false}
 function mDown(e){if(!e.touches){if(e.button == 2){pointer.right=true}else{pointer.left=true}}else{pointer.left=true}}function mUp(e){if(!e.touches){if(e.button == 2){pointer.right=false}else{pointer.left=false}}else{pointer.left=false}}function mMove(e){let x, y;if(e.touches){x=e.touches[0].clientX;y=e.touches[0].clientY;}else if(e.pageX!=undefined&&e.pageY!=undefined){x=e.pageX;y=e.pageY}else{x=e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;y=e.clientY + document.body.scrollTop + document.documentElement.scrollTop}var rect = canvas.getBoundingClientRect();let scaleX = canvas.width / rect.width;let scaleY=canvas.height/rect.height;pointer.x = (x - canvas.offsetLeft)* scaleX;pointer.y = (y - canvas.offsetTop)* scaleY;e.preventDefault();}
-
 function touchStart(e){mMove(e);mDown(e)}
 function touchEnd(e){mUp(e);}
 addEventListener("keydown",kDown, false);//16 is shift e.keyCode;
@@ -72,13 +80,13 @@ addEventListener("keyup",kUp, false);
 addEventListener("mousedown",mDown,false);
 addEventListener("mouseup",mUp,false);
 addEventListener("mousemove",mMove,false);
-addEventListener('wheel',wheel,false);
+//addEventListener('wheel',wheel,false);
 // Add touch event listeners with { passive: false }
 addEventListener("touchstart",touchStart, { passive: false });
 addEventListener("touchend",touchEnd, { passive: false });
 addEventListener("touchmove",mMove, { passive: false });
 addEventListener('contextmenu',function(event) {event.preventDefault()});
-function wheel(e){if(e.deltaY<0){wheelDir++}else{wheelDir--}};
+//function wheel(e){if(e.deltaY<0){wheelDir++}else{wheelDir--}};
 // The main game loop
 FPS = [];fps=0;
 function main(){var now = Date.now();var delta = now - then;timeShift = delta / 1000;FPS.push(Math.floor(1/timeShift));if(FPS.length>10){let temp=0;for(let f = 0;f<FPS.length;f++){temp+=FPS[f]}fps = Math.floor(temp/FPS.length);FPS = [];};ctx.clearRect(0, 0, canvas.width, canvas.height);loop();then = now;requestAnimationFrame(main);};
@@ -87,8 +95,8 @@ var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 // Let's play this game!
 var then = Date.now();
-start();
-main();
+
+
 </script>
 </body>
 </html>
