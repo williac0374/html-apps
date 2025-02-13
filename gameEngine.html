@@ -93,7 +93,7 @@ function object_handler(){
       blocks.splice(b,1)
     }
     if(blocks[b].hilite){
-      ctx.lineWidth = 8;
+      ctx.lineWidth = 12;
       ctx.strokeStyle=palette[19];//white
       ctx.setLineDash([6,2]);
       draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,true,0,0,0)
