@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+<link rel="manifest" href="manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>gameEngine</title>
@@ -27,11 +27,16 @@ canvas {
 <!--  <script src="assets.js"></script>  -->
 <canvas id="canvas"></canvas>
 <script>
- var palette = ['#be4a2f','#d77643','#ead4aa','#e4a672','#b86f50','#733e39','#3e2731','#a22633','#e43b44','#f77622','#feae34','#fee761','#63c74d','#3e8948','#265c42','#193c3e','#124e89','#0099db','#2ce8f5','#ffffff','#c0cbdc','#8b9bb4','#5a6988','#3a4466','#262b44','#181425','#ff0044','#68386c','#b55088','#f6757a','#e8b796','#c28569']; 
+var palette = ['#be4a2f','#d77643','#ead4aa','#e4a672','#b86f50','#733e39','#3e2731','#a22633','#e43b44','#f77622','#feae34','#fee761','#63c74d','#3e8948','#265c42','#193c3e','#124e89','#0099db','#2ce8f5','#ffffff','#c0cbdc','#8b9bb4','#5a6988','#3a4466','#262b44','#181425','#ff0044','#68386c','#b55088','#f6757a','#e8b796','#c28569'];
 first=true
 //ctx.fillStyle = "#ff00ff";ctx.strokeStyle = "#ff00ff";ctx.globalAlpha =1;
 W = 0;
 H = 0;
+sortedPalette = JSON.parse(JSON.stringify(shuffleArray(palette)))
+hilite = sortedPalette[4];
+h_lite={c:-1,r:0,col:hilite}
+from_color = null
+noid={c:0,r:0,col:hilite,tCol:null}
 function start(){
 if(!first){return}
   first=false;
@@ -39,74 +44,103 @@ if(!first){return}
   from=null;
   let y = 0;
   let x = 0;
-  let percent = 25;
-  let size = pX(percent)
-  for(let i = 0; i<32; i++){
-    let temp = {
-      x:x*size,
-      y:y*size,
-      w:size,
-      h:size,
-      col:palette[Math.round(Math.random()*palette.length)],
-      tapped:false,
-      hilite:false,
-      kill:false,
+  let percent = 20;
+  let size = pX(percent);
+  game_board = [];
+  let temp=[];
+  for(let r = 0; r < 10; r++){
+    for(let c = 0; c < 5; c++){
+      temp.push(randTile(3));
     }
-    blocks.push(temp)
-    x+=1
-  if(x>=100/percent){x=0;y+=1}
+    game_board.push(JSON.parse(JSON.stringify(temp)));
+    temp=[];
   }
+  noid.tCol = game_board[noid.r][noid.c]
 }
 function loop(){
-  object_handler();
+  draw_game_board();
+  draw_h_lite();
+  draw_noid();
+  if(pointer.left){
+    set_h_lite();
+    swap_tiles();
+  }
+  if(key_down[27]){window.close()}
+   if(key_down[37]&&noid.c>0){noid.c--;key_down[37]=false;noid_ai()}
+  if(key_down[39]&&noid.c<4){noid.c++;key_down[39]=false;noid_ai()}
+  if(key_down[38]&&noid.r>0){noid.r--;key_down[38]=false;noid_ai()}
+  if(key_down[40]&&noid.r<9){noid.r++;key_down[40]=false;noid_ai()}
 }
-
-
-function object_handler(){
-  for(let b = blocks.length-1;b>=0;b--){
-    ctx.fillStyle=blocks[b].col;
-    draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,false,0,0,0)
-    if(tap(blocks[b])){
-      
-      if(from==null){
-        from=b
-        blocks[b].hilite=true;
-      }else{
-        blocks[b].hilite=true
-        let toX = blocks[b].x;
-        let toY = blocks[b].y;
-        let fromX = blocks[from].x;
-        let fromY = blocks[from].y;
-        blocks[b].x=fromX;
-        blocks[b].y=fromY;
-        blocks[from].x=toX;
-        blocks[from].y=toY;
-        let f = from
-        setTimeout(function(){blocks[f].hilite=false;blocks[b].hilite=false;},50);
-        
-        from=null;
-      }
-      
-      pointer.left=false;
-    }
-    if(blocks[b].kill){
-      blocks.splice(b,1)
-    }
-    if(blocks[b].hilite){
-      ctx.lineWidth = 12;
-      ctx.strokeStyle=palette[19];//white
-      ctx.setLineDash([6,2]);
-      draw_rectangle(blocks[b].x, blocks[b].y, blocks[b].w, blocks[b].h,true,0,0,0)
-      ctx.lineWidth = 1;
-      ctx.setLineDash([]);
+function swap_tiles(){
+  if(from_color==null){
+  from_color = {r:h_lite.r,c:h_lite.c,col:game_board[h_lite.r][h_lite.c]}
+  }else{
+    let to_color = game_board[h_lite.r][h_lite.c];
+    game_board[from_color.r][from_color.c]=to_color;
+    game_board[h_lite.r][h_lite.c]=from_color.col;
+    from_color=null;
+  }
+  
+  pointer.left=false
+}
+function set_h_lite(){let percent = 20;let size = pX(percent);h_lite.c = Math.floor(pointer.x/size);h_lite.r = Math.floor(pointer.y/size);}
+function draw_h_lite(){
+if(from_color==null){return}
+  let percent = 20;
+  let size = pX(percent);
+  ctx.lineWidth = 4;
+  ctx.setLineDash([6,3]);
+  ctx.strokeStyle = h_lite.col;
+  draw_rectangle(h_lite.c*size, h_lite.r*size, size, size,true,0,0,0);
+  ctx.setLineDash([]);
+}
+function draw_noid(){
+  let percent = 20;
+  let size = pX(percent);
+  ctx.strokeStyle = h_lite.col;
+  ctx.lineWidth = 4;
+  draw_circle(noid.c*size+(size/2), noid.r*size+(size/2), size*.45, true)
+  draw_rectangle(noid.c*size+(size/2), noid.r*size+(size/6), size/2, size/2,true,45,0,0)
+  draw_line(noid.c*size+(size/2), noid.r*size+(size/2), noid.c*size+(size/2), noid.r*size+size)
+}
+function noid_ai(){
+  noid.tCol=game_board[noid.r][noid.c]
+  let left=0;
+  let right=0;
+  let up=0;
+  let down=0;
+  for(let d=1;d+noid.r<10;d++){
+    if(game_board[noid.r+d][noid.c]==noid.tCol){
+      down++
+    }else{
+      document.title='up:'+up+'  down:'+down+'   left:'+left+'   right:'+right
+      d = 20;
     }
     
   }
+
+
 }
+function draw_game_board(){let percent = 20;let size = pX(percent);for(let r = 0; r < 10; r++){for(let c = 0; c < 5; c++){ctx.fillStyle =  sortedPalette[game_board[r][c]];draw_rectangle(c*size, r*size, size, size,0,0,0,0);}}}
+function randTile(num){return Math.round(Math.random()*num);}
+function shuffleArray(array) {let curId = array.length;while (0 !== curId) {let randId = Math.floor(Math.random() * curId);curId -= 1;let tmp = array[curId];array[curId] = array[randId];array[randId] = tmp;}return array;}
 function tap(obj){let x=pointer.x;let y=pointer.y;let l=obj.x;let r=obj.x+obj.w;let t=obj.y;let b=obj.y+obj.h;if(x>l&&x<r&&y>t&&y<b&&pointer.left){return true;}else{return false;}}
 function pX(x){return Math.round(W*(x/100));}function pY(y){return Math.round(H*(y/100));}
 function randCol(){let output = '#';for(let i=0;i<6;i++){let t = Math.round(Math.random()*16);let h = t.toString();if(t==11){h='a'};if(t==12){h='b'};if(t==13){h='c'};if(t==14){h='d'};if(t==15){h='e'};if(t==16){h='f'}output+=h;}return output;}
 function draw_rectangle(x, y, w, h,outline,rot,ox,oy) {if(rot!=null){ctx.save();ctx.translate(x,y);ctx.rotate(rot*Math.PI/180);ctx.beginPath();if (outline) ctx.strokeRect( -ox,-oy,w,h);else ctx.fillRect( -ox,-oy,w,h );ctx.closePath();ctx.restore()}else{ctx.beginPath();if (outline) ctx.strokeRect( x,y,w,h);else ctx.fillRect( x,y,w,h );ctx.closePath()}}
+function draw_circle(x, y, r, outline) {
+  ctx.beginPath();
+  ctx.arc( x,y,r, 0,  Math.PI * 2, true );
+  ctx.closePath();
+  !outline ? ctx.fill() : ctx.stroke();
+}
+function draw_line(x1, y1, x2, y2) {
+  ctx.beginPath();
+  ctx.moveTo( x1, y1);
+  ctx.lineTo( x2, y2);
+  ctx.closePath();
+  ctx.stroke();
+}
 canvas = document.getElementById('canvas');
 ctx = canvas.getContext("2d");
 function resizeCanvas() {if(detectDevice()=='mobile'){W = window.visualViewport ? window.visualViewport.width : window.innerWidth;H = window.visualViewport ? window.visualViewport.height : window.innerHeight;}else{H = window.visualViewport ? window.visualViewport.height : window.innerHeight;W = H/2;}canvas.width=W;canvas.height=H;start();main();}
