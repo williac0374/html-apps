@@ -65,11 +65,11 @@ function loop(){
     set_h_lite();
     swap_tiles();
   }
-  if(key_down[27]){window.close()}
-   if(key_down[37]&&noid.c>0){noid.c--;key_down[37]=false;noid_ai()}
-  if(key_down[39]&&noid.c<4){noid.c++;key_down[39]=false;noid_ai()}
-  if(key_down[38]&&noid.r>0){noid.r--;key_down[38]=false;noid_ai()}
-  if(key_down[40]&&noid.r<9){noid.r++;key_down[40]=false;noid_ai()}
+if(key_down[27]){window.close()}
+if(key_down[37]&&noid.c>0){noid.c--;key_down[37]=false;noid_ai()}
+if(key_down[39]&&noid.c<4){noid.c++;key_down[39]=false;noid_ai()}
+if(key_down[38]&&noid.r>0){noid.r--;key_down[38]=false;noid_ai()}
+if(key_down[40]&&noid.r<9){noid.r++;key_down[40]=false;noid_ai()}
 }
 function swap_tiles(){
   if(from_color==null){
@@ -109,17 +109,43 @@ function noid_ai(){
   let right=0;
   let up=0;
   let down=0;
-  for(let d=1;d+noid.r<10;d++){
-    if(game_board[noid.r+d][noid.c]==noid.tCol){
-      down++
-    }else{
-      document.title='up:'+up+'  down:'+down+'   left:'+left+'   right:'+right
-      d = 20;
+  for(let i=0;i<10;i++){
+    if(noid.r+i<10){
+      if(game_board[noid.r+i][noid.c]==noid.tCol){
+        down++;
+      }else{
+        i=10;
+      }
     }
-    
   }
-
-
+  for(let i=0;i<10;i++){
+    if(noid.r-i>=0){
+      if(game_board[noid.r-i][noid.c]==noid.tCol){
+        up++;
+      }else{
+        i=10;
+      }
+    }
+  }
+    for(let i=0;i<10;i++){
+    if(noid.c-i>=0){
+      if(game_board[noid.r][noid.c-i]==noid.tCol){
+        left++;
+      }else{
+        i=10;
+      }
+    }
+  }
+      for(let i=0;i<10;i++){
+    if(noid.c+i<5){
+      if(game_board[noid.r][noid.c+i]==noid.tCol){
+        right++;
+      }else{
+        i=10;
+      }
+    }
+  }
+  document.title='up:'+up+'  down:'+down+'   left:'+left+'   right:'+right+'   noid.r: '+noid.r+', noid.c: '+noid.c
 }
 function draw_game_board(){let percent = 20;let size = pX(percent);for(let r = 0; r < 10; r++){for(let c = 0; c < 5; c++){ctx.fillStyle =  sortedPalette[game_board[r][c]];draw_rectangle(c*size, r*size, size, size,0,0,0,0);}}}
 function randTile(num){return Math.round(Math.random()*num);}
