@@ -36,7 +36,7 @@ sortedPalette = JSON.parse(JSON.stringify(shuffleArray(palette)))
 hilite = sortedPalette[4];
 h_lite={c:-1,r:0,col:hilite}
 from_color = null
-noid={c:0,r:0,col:hilite,tCol:null}
+noid={c:0,r:0,col:hilite,tCol:null,dir:'npne'}
 function start(){
 if(!first){return}
   first=false;
@@ -56,6 +56,7 @@ if(!first){return}
     temp=[];
   }
   noid.tCol = game_board[noid.r][noid.c]
+  noid_ai();
 }
 function loop(){
   draw_game_board();
@@ -79,6 +80,7 @@ function swap_tiles(){
     game_board[from_color.r][from_color.c]=to_color;
     game_board[h_lite.r][h_lite.c]=from_color.col;
     from_color=null;
+    noid_ai();
   }
   
   pointer.left=false
@@ -127,7 +129,7 @@ function noid_ai(){
       }
     }
   }
-    for(let i=0;i<10;i++){
+  for(let i=0;i<10;i++){
     if(noid.c-i>=0){
       if(game_board[noid.r][noid.c-i]==noid.tCol){
         left++;
@@ -136,7 +138,7 @@ function noid_ai(){
       }
     }
   }
-      for(let i=0;i<10;i++){
+  for(let i=0;i<10;i++){
     if(noid.c+i<5){
       if(game_board[noid.r][noid.c+i]==noid.tCol){
         right++;
@@ -145,7 +147,23 @@ function noid_ai(){
       }
     }
   }
-  document.title='up:'+up+'  down:'+down+'   left:'+left+'   right:'+right+'   noid.r: '+noid.r+', noid.c: '+noid.c
+  noid.dir='none';
+  if(up>down&&up>left&&up>right){
+    noid.dir='up'
+  }
+  if(down>up&&down>left&&down>right){
+    noid.dir='down'
+  }
+  if(left>down&&left>up&&left>right){
+    noid.dir='left'
+  }
+  if(right>down&&right>left&&right>up){
+    noid.dir='right'
+  }
+if(noid.dir=='up'){noid.r--}
+if(noid.dir=='down'){noid.r++}
+if(noid.dir=='left'){noid.c--}
+if(noid.dir=='right'){noid.c++}
 }
 function draw_game_board(){let percent = 20;let size = pX(percent);for(let r = 0; r < 10; r++){for(let c = 0; c < 5; c++){ctx.fillStyle =  sortedPalette[game_board[r][c]];draw_rectangle(c*size, r*size, size, size,0,0,0,0);}}}
 function randTile(num){return Math.round(Math.random()*num);}
