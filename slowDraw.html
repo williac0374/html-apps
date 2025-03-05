@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -411,10 +411,15 @@ if(but=='clearColor'){tool=3}
   if(but=='undo'){
     // if no undos exist return
   if(undo.length==0){return}
-    // sets data to last undo
-    frames[frame]=JSON.parse(JSON.stringify(undo[undo.length-1]))
-    // removes last undo
-    undo.splice(undo.length-1,1)
+    if(undo.length>1){
+      // removes last undo
+      undo.splice(undo.length-1,1)
+      // sets data to last undo
+      frames[frame]=JSON.parse(JSON.stringify(undo[undo.length-1]))
+    }else{
+      frames[frame]=data_clear(grid_div)
+      undo=[];
+    }
   }
 if(but=='up'){up_frame()}
 if(but=='down'){down_frame()}
@@ -531,7 +536,15 @@ function loop(){
     
   }
   if(mouse_check_released()){
-    undo.push(JSON.parse(JSON.stringify(data)))
+    let mx=mouse_x;
+    let my=mouse_y;
+    let left=draw_canvas.x;
+    let top=draw_canvas.y;
+    let right=draw_canvas.x+draw_canvas.w;
+    let bottom=draw_canvas.y+draw_canvas.h;
+    if(mx>left&&mx<right&&my>top&&my<bottom){ // mouse is over draw_canvas
+      undo.push(JSON.parse(JSON.stringify(frames[frame])))
+    }
   }
   
   
