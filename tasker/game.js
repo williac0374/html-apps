@@ -1405,8 +1405,8 @@ var viewportHeight = 0;
 setTimeout(function(){
 viewportWidth = window.innerWidth;
 viewportHeight = window.innerHeight;
-tu_canvas.width=viewportWidth;
-tu_canvas.height=viewportHeight;
+tu_canvas.width=viewportWidth*0.9;
+tu_canvas.height=viewportHeight*0.9;
 alert("hello")
 },1000)
 }
@@ -1462,3 +1462,4 @@ tu_room_to_go = scene_4;
 
 tu_gameloop = tu_loop;
 tu_loop();
+
