@@ -1,0 +1,17 @@
+{
+  "name": "Boot",
+  "short_name": "BOOT",
+  "description": "Github Page as a Progressive Web App",
+  "scope": "/html-apps/",
+  "start_url": "/html-apps/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "fullscreen", 
+  "icons": [
+      {
+        "src": "/html-apps/icon.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+  ]
+}
