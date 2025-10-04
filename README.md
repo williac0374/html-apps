@@ -10,4 +10,4 @@ https://williac0374.github.io/html-apps/slowDraw.html
 <br><br>
 https://williac0374.github.io/html-apps/gameEngine.html
 <br><br>
-https://williac0374.github.io/html-apps/tasker/index.html
+https://williac0374.github.io/html-apps/yatzeeScoreCard.html
