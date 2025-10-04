@@ -1,6 +1,6 @@
 {
-  "name": "Boot",
-  "short_name": "BOOT",
+  "name": "yatzee scoreboard",
+  "short_name": "yatzee scoreboard",
   "description": "Github Page as a Progressive Web App",
   "scope": "/html-apps/",
   "start_url": "/html-apps/",
