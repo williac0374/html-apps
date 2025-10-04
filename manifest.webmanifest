@@ -9,7 +9,7 @@
   "display": "fullscreen", 
   "icons": [
       {
-        "src": "/html-apps/icon.png",
+        "src": "/html-apps/yicon.png",
         "type": "image/png",
         "sizes": "512x512"
       }
