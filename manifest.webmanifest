@@ -3,7 +3,7 @@
   "short_name": "yatzee scoreboard",
   "description": "Github Page as a Progressive Web App",
   "scope": "/html-apps/",
-  "start_url": "/html-apps/",
+  "start_url": "/html-apps/yatzeeScoreCard.html",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "display": "fullscreen", 
