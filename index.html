@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='apple-mobile-web-app-capable' content='yes' />
+    <meta name='viewport' content='initial-scale=1.0, maximum-scale=1.0, user-scalable=0, width=device-width, height=device-height' />
+    <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+    <title>No-Scroll Yahtzee Scoreboard</title>
+     <link rel="canonical" href="https://williac0374.github.io/html-apps/" />
+  <link rel="manifest" href="/html-apps/manifest.webmanifest">
+    <style>
+        /* CSS for mobile-first, no-scroll design */
+        html, body {
+            height: 100%; /* Important for no-scroll constraint */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* THE KEY: Prevents scrolling */
+            font-family: Arial, sans-serif;
+            background-color: #343a40; /* Dark background */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. HEADER (Takes minimal space) */
+        header {
+            padding: 8px 0;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            background-color: #212529;
+        }
+
+        /* 2. MAIN GRID (Core scoring area) */
+        #main-container {
+            flex-grow: 1; /* Allows it to fill the remaining space */
+            display: grid;
+            /* 1 column for categories, 2 for players */
+            grid-template-columns: 1fr 0.7fr 0.7fr; 
+            grid-auto-rows: minmax(0, 1fr); /* Distribute rows equally */
+            padding: 5px;
+            overflow: hidden; /* Redundant, but safe */
+        }
+        
+        .cell {
+            border: 1px solid #495057;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            font-size: 0.8em;
+            overflow: hidden; /* Truncate long text if necessary */
+        }
+
+        /* Player Names - Click to Edit */
+        .player-name {
+            background-color: #007bff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        /* Category Names - Left Column */
+        .category-label {
+            background-color: #495057;
+            text-align: left;
+            padding-left: 5px;
+            justify-content: flex-start;
+        }
+
+        /* Score Input Fields */
+        input[type="number"] {
+            width: 90%;
+            height: 90%;
+            padding: 0;
+            margin: 0;
+            border: none;
+            text-align: center;
+            background-color: #fff;
+            color: #333;
+            font-weight: bold;
+            font-size: 0.9em;
+            -moz-appearance: textfield; /* Hide arrows on Firefox */
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none; /* Hide arrows on Chrome/Safari */
+            margin: 0;
+        }
+        
+        /* 3. FOOTER (Totals Display) */
+        footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 10px 5px;
+            background-color: #1e7e34; /* Green for final totals */
+            font-weight: bold;
+        }
+        .final-total {
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .total-label {
+            font-size: 0.7em;
+            margin-bottom: 2px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>YAHTZEE SCOREBOARD</header>
+
+    <div id="main-container">
+        <div class="cell category-label">CATEGORY</div>
+        <div class="cell player-name" contenteditable="true" id="p1_name_cell" title="Click to rename Player 1">P1</div>
+        <div class="cell player-name" contenteditable="true" id="p2_name_cell" title="Click to rename Player 2">P2</div>
+
+        <div class="cell category-label">Ones (1)</div><div class="cell"><input type="number" id="p1_ones" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_ones" oninput="calculateScore()"></div>
+        <div class="cell category-label">Twos (2)</div><div class="cell"><input type="number" id="p1_twos" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_twos" oninput="calculateScore()"></div>
+        <div class="cell category-label">Threes (3)</div><div class="cell"><input type="number" id="p1_threes" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_threes" oninput="calculateScore()"></div>
+        <div class="cell category-label">Fours (4)</div><div class="cell"><input type="number" id="p1_fours" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_fours" oninput="calculateScore()"></div>
+        <div class="cell category-label">Fives (5)</div><div class="cell"><input type="number" id="p1_fives" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_fives" oninput="calculateScore()"></div>
+        <div class="cell category-label">Sixes (6)</div><div class="cell"><input type="number" id="p1_sixes" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_sixes" oninput="calculateScore()"></div>
+        
+        <div class="cell category-label">3 Knd</div><div class="cell"><input type="number" id="p1_3ofakind" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_3ofakind" oninput="calculateScore()"></div>
+        <div class="cell category-label">4 Knd</div><div class="cell"><input type="number" id="p1_4ofakind" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_4ofakind" oninput="calculateScore()"></div>
+        <div class="cell category-label">FH (25)</div><div class="cell"><input type="number" id="p1_fullhouse" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_fullhouse" oninput="calculateScore()"></div>
+        <div class="cell category-label">SS (30)</div><div class="cell"><input type="number" id="p1_smstraight" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_smstraight" oninput="calculateScore()"></div>
+        <div class="cell category-label">LS (40)</div><div class="cell"><input type="number" id="p1_lgstraight" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_lgstraight" oninput="calculateScore()"></div>
+        <div class="cell category-label">Chance</div><div class="cell"><input type="number" id="p1_chance" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_chance" oninput="calculateScore()"></div>
+        <div class="cell category-label">Ytz (50)</div><div class="cell"><input type="number" id="p1_yatzee" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_yatzee" oninput="calculateScore()"></div>
+        <div class="cell category-label">Ytz Bns</div><div class="cell"><input type="number" id="p1_yatzee_bonus" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_yatzee_bonus" oninput="calculateScore()"></div>
+        <div class="cell category-label">Upper Bns</div><div class="cell" id="p1_bonus_upper">0</div><div class="cell" id="p2_bonus_upper">0</div>
+
+        </div>
+
+    <footer>
+        <div class="final-total">
+            <div class="total-label">P1 GRAND TOTAL</div>
+            <div id="p1_grand_total">0</div>
+        </div>
+        <div class="final-total">
+            <div class="total-label">P2 GRAND TOTAL</div>
+            <div id="p2_grand_total">0</div>
+        </div>
+    </footer>
+
+
+    <script>
+        // JavaScript logic remains largely the same, but now targets the simplified display elements.
+        
+        function calculatePlayerScore(playerPrefix) {
+            let upperSum = 0;
+            const upperCategories = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+            
+            // 1. Calculate Upper Sum
+            for (const category of upperCategories) {
+                const inputId = `${playerPrefix}_${category}`;
+                // Get the value, convert to number, default to 0 if empty or not a number
+                const value = parseInt(document.getElementById(inputId).value) || 0;
+                upperSum += value;
+            }
+
+            // 2. Calculate Upper Bonus
+            const upperBonus = upperSum >= 63 ? 35 : 0;
+            
+            // 3. Calculate Total Upper Score
+            const totalUpper = upperSum + upperBonus;
+
+            // Update Upper Bonus display
+            document.getElementById(`${playerPrefix}_bonus_upper`).textContent = upperBonus;
+
+            // 4. Calculate Lower Sum
+            let lowerSum = 0;
+            const lowerCategories = ["3ofakind", "4ofakind", "fullhouse", "smstraight", "lgstraight", "yatzee", "chance"];
+            const lowerBonusCategory = "yatzee_bonus";
+            
+            for (const category of lowerCategories) {
+                const inputId = `${playerPrefix}_${category}`;
+                const value = parseInt(document.getElementById(inputId).value) || 0;
+                lowerSum += value;
+            }
+
+            // Add Yahtzee Bonus
+            const yatzeeBonus = parseInt(document.getElementById(`${playerPrefix}_${lowerBonusCategory}`).value) || 0;
+            lowerSum += yatzeeBonus; 
+            
+            // 5. Total Lower Score is just the Lower Sum (including bonus)
+            const totalLower = lowerSum;
+
+            // 6. Calculate Grand Total
+            const grandTotal = totalUpper + totalLower;
+            document.getElementById(`${playerPrefix}_grand_total`).textContent = grandTotal;
+        }
+
+        // Master function called on every input change
+        function calculateScore() {
+            calculatePlayerScore('p1');
+            calculatePlayerScore('p2');
+        }
+
+        // Initial calculation to set all totals to 0 on load
+        window.onload = calculateScore;
+
+        // Optional: Update player names displayed in the footer when the header is edited
+        document.getElementById('p1_name_cell').addEventListener('input', function() {
+            // No direct update needed in this version, but you could add it here.
+        });
+        document.getElementById('p2_name_cell').addEventListener('input', function() {
+            // No direct update needed in this version, but you could add it here.
+        });
+    </script>
+</body>
+</html>
