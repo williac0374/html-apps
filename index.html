@@ -29,6 +29,8 @@
             font-size: 1.1em;
             font-weight: bold;
             background-color: #212529;
+            cursor: pointer; /* Indicate it's clickable for reset */
+            user-select: none; /* Prevent text selection on click */
         }
 
         /* 2. MAIN GRID (Core scoring area) */
@@ -109,12 +111,12 @@
 </head>
 <body>
 
-    <header>YAHTZEE SCOREBOARD</header>
+    <header onclick="resetScorecard()">YAHTZEE SCOREBOARD</header> 
 
     <div id="main-container">
         <div class="cell category-label">CATEGORY</div>
-        <div class="cell player-name" contenteditable="true" id="p1_name_cell" title="Click to rename Player 1">P1</div>
-        <div class="cell player-name" contenteditable="true" id="p2_name_cell" title="Click to rename Player 2">P2</div>
+        <div class="cell player-name" contenteditable="true" id="p1_name_cell" title="Click to rename Player 1" oninput="saveScorecard()">P1</div>
+        <div class="cell player-name" contenteditable="true" id="p2_name_cell" title="Click to rename Player 2" oninput="saveScorecard()">P2</div>
 
         <div class="cell category-label">Ones (1)</div><div class="cell"><input type="number" id="p1_ones" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_ones" oninput="calculateScore()"></div>
         <div class="cell category-label">Twos (2)</div><div class="cell"><input type="number" id="p1_twos" oninput="calculateScore()"></div><div class="cell"><input type="number" id="p2_twos" oninput="calculateScore()"></div>
@@ -148,7 +150,119 @@
 
 
     <script>
-        // JavaScript logic remains largely the same, but now targets the simplified display elements.
+        // List of all score input IDs (only the category part)
+        const SCORE_CATEGORIES = [
+            "ones", "twos", "threes", "fours", "fives", "sixes",
+            "3ofakind", "4ofakind", "fullhouse", "smstraight", "lgstraight", "chance", "yatzee", "yatzee_bonus"
+        ];
+        const PLAYERS = ['p1', 'p2'];
+        
+        // --- LOCAL STORAGE LOGIC ---
+        
+        /**
+         * Saves the current state of the scoreboard to localStorage.
+         */
+        function saveScorecard() {
+            const yatzeeData = {
+                scores: {},
+                names: {}
+            };
+
+            // 1. Save Player Names
+            yatzeeData.names.p1 = document.getElementById('p1_name_cell').textContent;
+            yatzeeData.names.p2 = document.getElementById('p2_name_cell').textContent;
+
+            // 2. Save Scores
+            for (const player of PLAYERS) {
+                for (const category of SCORE_CATEGORIES) {
+                    const id = `${player}_${category}`;
+                    const inputElement = document.getElementById(id);
+                    // Save the raw value from the input field
+                    yatzeeData.scores[id] = inputElement ? inputElement.value : '';
+                }
+            }
+
+            try {
+                localStorage.setItem('yatzee', JSON.stringify(yatzeeData));
+            } catch (e) {
+                console.error("Error saving to localStorage", e);
+            }
+        }
+        
+        /**
+         * Loads the saved state from localStorage and populates the scoreboard.
+         */
+        function loadScorecard() {
+            const savedData = localStorage.getItem('yatzee');
+            
+            if (savedData) {
+                try {
+                    const yatzeeData = JSON.parse(savedData);
+                    
+                    // 1. Restore Player Names
+                    if (yatzeeData.names) {
+                        document.getElementById('p1_name_cell').textContent = yatzeeData.names.p1 || 'P1';
+                        document.getElementById('p2_name_cell').textContent = yatzeeData.names.p2 || 'P2';
+                    }
+
+                    // 2. Restore Scores
+                    if (yatzeeData.scores) {
+                        for (const player of PLAYERS) {
+                            for (const category of SCORE_CATEGORIES) {
+                                const id = `${player}_${category}`;
+                                const inputElement = document.getElementById(id);
+                                if (inputElement && yatzeeData.scores[id] !== undefined) {
+                                    // Set the value back into the input field
+                                    inputElement.value = yatzeeData.scores[id];
+                                }
+                            }
+                        }
+                    }
+
+                } catch (e) {
+                    console.error("Error parsing or loading data from localStorage", e);
+                    // Clear corrupted data
+                    localStorage.removeItem('yatzee'); 
+                }
+            }
+            
+            // Recalculate totals after loading/initial setup
+            calculateScore();
+        }
+
+        /**
+         * Clears the scorecard and removes saved data after user confirmation.
+         */
+        function resetScorecard() {
+            const confirmation = confirm("Are you sure you want to reset the scorecard? This will clear all scores and names.");
+            
+            if (confirmation) {
+                // 1. Clear all input fields
+                for (const player of PLAYERS) {
+                    for (const category of SCORE_CATEGORIES) {
+                        const id = `${player}_${category}`;
+                        const inputElement = document.getElementById(id);
+                        if (inputElement) {
+                            inputElement.value = '';
+                        }
+                    }
+                }
+                
+                // 2. Reset Player Names
+                document.getElementById('p1_name_cell').textContent = 'P1';
+                document.getElementById('p2_name_cell').textContent = 'P2';
+
+                // 3. Clear localStorage data
+                localStorage.removeItem('yatzee');
+                
+                // 4. Recalculate to clear all displayed totals
+                calculateScore();
+
+                alert("Scorecard has been reset!");
+            }
+        }
+
+        // --- SCORING LOGIC (Slightly modified to call saveScorecard) ---
         
         function calculatePlayerScore(playerPrefix) {
             let upperSum = 0;
@@ -165,8 +279,7 @@
             // 2. Calculate Upper Bonus
             const upperBonus = upperSum >= 63 ? 35 : 0;
             
-            // 3. Calculate Total Upper Score
-            const totalUpper = upperSum + upperBonus;
+            // 3. Calculate Total Upper Score - not explicitly needed for grand total, but useful conceptually
 
             // Update Upper Bonus display
             document.getElementById(`${playerPrefix}_bonus_upper`).textContent = upperBonus;
@@ -190,7 +303,7 @@
             const totalLower = lowerSum;
 
             // 6. Calculate Grand Total
-            const grandTotal = totalUpper + totalLower;
+            const grandTotal = upperSum + upperBonus + totalLower; // Total Upper (Sum + Bonus) + Total Lower (Sum + Yahtzee Bonus)
             document.getElementById(`${playerPrefix}_grand_total`).textContent = grandTotal;
         }
 
@@ -198,18 +311,12 @@
         function calculateScore() {
             calculatePlayerScore('p1');
             calculatePlayerScore('p2');
+            saveScorecard(); // <-- NEW: Save the state every time a score changes
         }
 
-        // Initial calculation to set all totals to 0 on load
-        window.onload = calculateScore;
+        // Initial setup: Load from storage, then calculate totals
+        window.onload = loadScorecard; // <-- NEW: Load from storage instead of just calculating
 
-        // Optional: Update player names displayed in the footer when the header is edited
-        document.getElementById('p1_name_cell').addEventListener('input', function() {
-            // No direct update needed in this version, but you could add it here.
-        });
-        document.getElementById('p2_name_cell').addEventListener('input', function() {
-            // No direct update needed in this version, but you could add it here.
-        });
     </script>
 </body>
 </html>
