@@ -1,5 +1,22 @@
+//'use strict';
+let // ZzFXMicro - Zuper Zmall Zound Zynth - v1.3.2 by Frank Force
+zzfxV=.3,               // volume
+zzfxX=new AudioContext, // audio context
+zzfx=                   // play sound
+(p=1,k=.05,b=220,e=0,r=0,t=.1,q=0,D=1,u=0,y=0,v=0,z=0,l=0,E=0,A=0,F=0,c=0,w=1,m=0,B=0
+,N=0)=>{let M=Math,d=2*M.PI,R=44100,G=u*=500*d/R/R,C=b*=(1-k+2*k*M.random(k=[]))*d/R,
+g=0,H=0,a=0,n=1,I=0,J=0,f=0,h=N<0?-1:1,x=d*h*N*2/R,L=M.cos(x),Z=M.sin,K=Z(x)/4,O=1+K,
+X=-2*L/O,Y=(1-K)/O,P=(1+h*L)/2/O,Q=-(h+L)/O,S=P,T=0,U=0,V=0,W=0;e=R*e+9;m*=R;r*=R;t*=
+R;c*=R;y*=500*d/R**3;A*=d/R;v*=d/R;z*=R;l=R*l|0;p*=zzfxV;for(h=e+m+r+t+c|0;a<h;k[a++]
+=f*p)++J%(100*F|0)||(f=q?1<q?2<q?3<q?4<q?(g/d%1<D/2)*2-1:Z(g**3):M.max(M.min(M.tan(g)
+,1),-1):1-(2*g/d%2+2)%2:1-4*M.abs(M.round(g/d)-g/d):Z(g),f=(l?1-B+B*Z(d*a/l):1)*(4<q?
+f:(f<0?-1:1)*M.abs(f)**D)*(a<e?a/e:a<e+m?1-(a-e)/m*(1-w):a<e+m+r?w:a<h-c?(h-a-c)/t*w:
+0),f=c?f/2+(c>a?0:(a<h-c?1:(h-a)/c)*k[a-c|0]/2/p):f,N?f=W=S*T+Q*(T=U)+P*(U=f)-Y*V-X*(
+V=W):0),x=(b+=u+=y)*M.cos(A*H++),g+=x+x*E*Z(a**5),n&&++n>z&&(b+=v,C+=v,n=0),!l||++I%l
+||(b=C,u=G,n=n||1);X=zzfxX,p=X.createBuffer(1,h,R);p.getChannelData(0).set(k);b=X.
+createBufferSource();b.buffer=p;b.connect(X.destination);b.start()}
 //misc
-master_alpha = 1;timeShift=0,FPS=[],fps=0,run=true,fullscreen=false;
+master_alpha = 1;timeShift=0,FPS=[],fps=0,run=true,fullscreen=false;gpad0 = gamepad(0),gpad1 = gamepad(1)
 // math:
 max = Math.max, min = Math.min, round = Math.round, floor = Math.floor, ceil = Math.ceil,
 sin = Math.sin, cos = Math.cos, sqrt = Math.sqrt, tan = Math.tan, rand = Math.random,
@@ -22,7 +39,11 @@ vk_x = 88, vk_y = 89, vk_z = 90,
 // i/o variables:
 mouse_x = mouse_y = 0, mouse_down = mouse_right_down= mouse_pressed = mouse_released = false,wheelDir=0,
 key_down = [], key_pressed = [], key_released = [],all_keys_pressed = [],all_keys_released = [];
-vk_all_keys = [];
+vk_all_keys = [];is_touch=false
+gp0_A=0, gp0_B=1, gp0_X=22, gp0_Y=3, gp0_LB=4, gp0_RB=5, gp0_LB=6, gp0_RB=7, gp0_SEL=8, gp0_STR=9, gp0_UP=12, gp0_DWN=13, gp0_LFT=14, gp0_RHT=15, gp0_ax0=0, gp0_ax1=0, gp0_ax2=0, gp0_ax3=0;
+gp0_down = [], gp0_pressed = [], gp0_released = []
+gp1_A=0, gp1_B=1, gp1_X=22, gp1_Y=3, gp1_LB=4, gp1_RB=5, gp1_LB=6, gp1_RB=7, gp1_SEL=8, gp1_STR=9, gp1_UP=12, gp1_DWN=13, gp1_LFT=14, gp1_RHT=15, gp1_ax0=0, gp1_ax1=0, gp1_ax2=0, gp1_ax3=0;
+gp1_down = [], gp1_pressed = [], gp1_released = []
 function make_sound(_src,buffers){
   if (_src != '') {
     let temp = [];
@@ -262,6 +283,71 @@ function swiped(sensitivy){
 function mouse_check() { return mouse_down; }
 function mouse_check_pressed() { return mouse_pressed; }
 function mouse_check_released() { return mouse_released; }
+/**
+* Reads the current state of the (id) gamepad.
+* Intended to be called once per frame within your animation loop.
+*/
+function gamepad(id) {
+  buttons = []
+  axises = [0,0,0,0]
+  const gamepads = navigator.getGamepads();
+  const gp = gamepads[id];
+  if (!gp) return;
+  gp.buttons.forEach((button, index) => {
+    if(id==0){
+      if (button.pressed) {
+        buttons.push(index)
+        // Add your logic here (e.g., if (index === 0) jump())
+        if(!gp0_down[index]){ // the button is not already pressed it triggers gp0_pressed[index]
+          gp0_pressed[index]=true
+        }else{
+          gp0_pressed[index]=false // makes sure pressed only happens when its first pressed
+        }
+        gp0_down[index]=true // sets the currently pressed buttons gp0_down[] to true
+      }else{ // if this button is not currently pressed
+        if(gp0_down[index]){ // if it was previously down
+          gp0_released[index]=true // triggers once when first released
+        }else{
+          gp0_released[index]=false // makes sure its only triggered once when initialy released
+        }
+        gp0_down[index]=false
+      }
+    }else{
+      if (button.pressed) {
+        buttons.push(index)
+        // Add your logic here (e.g., if (index === 0) jump())
+        if(!gp1_down[index]){ // the button is not already pressed it triggers gp0_pressed[index]
+          gp1_pressed[index]=true
+        }else{
+          gp1_pressed[index]=false // makes sure pressed only happens when its first pressed
+        }
+        gp1_down[index]=true // sets the currently pressed buttons gp0_down[] to true
+      }else{ // if this button is not currently pressed
+        if(gp1_down[index]){ // if it was previously down
+          gp0_released[index]=true // triggers once when first released
+        }else{
+          gp1_released[index]=false // makes sure its only triggered once when initialy released
+        }
+        gp1_down[index]=false
+      }
+    }
+  });
+  const deadzone = 0.1;
+  gp.axes.forEach((axis, index) => {
+    if (Math.abs(axis) > deadzone) {
+      // Add your movement logic here
+    console.log(`Axis ${index} value: ${axis.toFixed(2)}`);
+      axises[index]=axis
+    }
+  });
+  if(id==0){
+    gp0_ax0 = axises[0],gp0_ax1 = axises[1],gp0_ax2 = axises[2],gp0_ax3 = axises[3]
+  }
+  if(id==1){
+    gp1_ax0 = axises[0],gp1_ax1 = axises[1],gp1_ax2 = axises[2],gp1_ax3 = axises[3]
+  }
+return { button: buttons, axises: axises };
+}
 //sets up canvas variables
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
@@ -287,8 +373,17 @@ function kUp(e){
   key_down[keyCode] = false;
 }
 function mDown(e){
-  if(e.button == 2) {
-    mouse_right_down=true
+  if(!is_touch){
+    if(e.button == 2) {
+      mouse_right_down=true
+    }else{
+      if (!mouse_down) {
+        mouse_down = true;
+        mouse_pressed = true;
+      }else{
+        mouse_down = true;
+      }
+    }
   }else{
     if (!mouse_down) {
       mouse_down = true;
@@ -300,8 +395,18 @@ function mDown(e){
 }
 
 function mUp(e) {
-  if(e.button == 2) {
-    mouse_right_down=false
+  if(!is_touch){
+    if(e.button == 2) {
+      mouse_right_down=false
+    }else{
+      if (!mouse_down) {
+        mouse_down = false;
+        mouse_pressed = false;
+      } else {
+        mouse_down = false;
+        mouse_released = true;
+      }
+    }
   }else{
     if (!mouse_down) {
       mouse_down = false;
@@ -311,6 +416,7 @@ function mUp(e) {
       mouse_released = true;
     }
   }
+  is_touch=false
 }
 
 function mMove(e) {
@@ -318,6 +424,7 @@ function mMove(e) {
   
   // Check for touch input
   if (e.touches) {
+    is_touch=true
     x = e.touches[0].clientX;
     y = e.touches[0].clientY;
   }
@@ -340,11 +447,13 @@ function mMove(e) {
   e.preventDefault(); // Prevent scrolling behavior
 }
 function touchStart(e) {
+  is_touch=true
   mMove(e);
   mDown();
 }
 
 function touchEnd(e) {
+  is_touch=true
   mUp();
 }
 addEventListener("keydown", kDown, false);//16 is shift e.keyCode;
@@ -361,8 +470,6 @@ addEventListener('contextmenu', function(event) {
   // Prevent the default context menu from appearing
   event.preventDefault();
   
-  // Do something on right click
-  console.log('Right click!');
 });
 function wheel(e) {
   if (e.deltaY < 0) {
@@ -385,6 +492,8 @@ function main() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     draw();
   }
+  gpad0 = gamepad(0);
+  gpad1 = gamepad(1)
   loop();
   
   //clears keypresses and mousepress

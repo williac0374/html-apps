@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name='apple-mobile-web-app-capable' content='yes' />
+<meta name='viewport' content='initial-scale=1.0, maximum-scale=1.0, user-scalable=0, width=device-width, height=device-height' />
+<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+<title>MAP</title>
+<style>
+/* CSS to disable scrolling and set fullscreen */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+}
+canvas {
+  border: 2px solid #000;
+  background-color: white;
+  display: block;
+  margin: 0 auto;
+}
+
+</style>
+</head>
+<body>
+<canvas id="canvas" width="560" height="560"></canvas>
+<script>
+monthName=['January','February','March','April','May','June','July','August','September','Octorber','November','December']
+month = [
+{ name: 1 , start: 4 , end: 31 },
+{ name: 2 , start: 0 , end: 28 },
+{ name: 3 , start: 0 , end: 31 },
+{ name: 4 , start: 3 , end: 30 },
+{ name: 5 , start: 5 , end: 31 },
+{ name: 6 , start: 1 , end: 30 },
+{ name: 7 , start: 3 , end: 31 },
+{ name: 8 , start: 6 , end: 31 },
+{ name: 9 , start: 2 , end: 30 },
+{ name: 10 , start: 4 , end: 31 },
+{ name: 11 , start: 0 , end: 30 },
+{ name: 12 , start: 2 , end: 31 },
+]
+cells = []
+
+function start(){
+  draw_set_color(255,255,255)
+  displayedMonth = 4
+  turn_page(displayedMonth)
+}
+function loop(){
+  
+  
+}
+function draw(){
+  draw_cells()
+  draw_gui()
+}
+
+function turn_page(mnth){
+  /*
+  if(instance_number(obj_cell) > 0){
+    var obj = instance_list(obj_cell)
+    for(let o = 0; o < obj.length ; o ++){
+      obj[o].instance_destroy()
+    }
+  }
+  */
+  var date = 1
+  var tick = 0
+  document.title=monthName[mnth]
+  for(let y = 0; y < canvas.height-80; y+=80 ){
+    for(let x = 0; x < canvas.width; x+=80 ){
+    let temp = {x:x,y:y,date:0}
+      if ( tick >= month[mnth].start && date<= month[mnth].end){
+        temp.date=date
+        date++
+      }
+      cells.push(temp)
+      tick++
+    }
+  }
+}
+function draw_cells(){
+  for(let c = 0;c < cells.length;c++){
+    draw_set_color(0,0,0)
+    draw_set_linewidth(1)
+    draw_rectangle(cells[c].x, cells[c].y, 80, 80, 1, 0, 0, 0)
+    let now = new Date();
+    let m = now.getMonth()
+    let d = now.getDate()
+    if(cells[c].date == d && displayedMonth==m){
+      draw_set_color(0,255,0)
+      draw_set_linewidth(5)
+      draw_rectangle(cells[c].x+5, cells[c].y+5, 70, 70, 1, 0, 0, 0)
+    }
+    if(!cells[c].date==0){
+      draw_set_color(0,0,0)
+      draw_text(cells[c].x+2,cells[c].y+2,cells[c].date)
+    }
+    
+  }
+}
+function draw_gui(){
+  let l = 5
+  let t = 485
+  draw_set_color(0,0,255)
+  draw_set_linewidth(3)
+  draw_rectangle(l, t, 100, 70, 1, 0, 0, 0)
+  draw_centered_text(l+50, t+35, "PREV", 22, 500) 
+  draw_rectangle(l+450, t, 100, 70, 1, 0, 0, 0)
+  draw_centered_text(l+500, t+35, "NEXT", 22, 500) 
+  
+  draw_centered_text(280, t+35, monthName[displayedMonth], 48, 700) 
+}
+</script>
+<script type='text/javascript' src='engine.js'></script>
+</body>
+</html>
+
+
