@@ -48,6 +48,7 @@ month = [
 cells = []
 cellW = 80
 cellH = 80
+inCell = 0
 function start(){
   draw_set_color(255,255,255)
   setTimeout(function(){
@@ -65,7 +66,14 @@ function start(){
   turn_page(displayedMonth)
 }
 function loop(){
+  if(mouse_check()){
+    inCell++
+  }else{
+    inCell=0
+  }
+
   if(mouse_check_pressed()){
+    
     const container = document.getElementById('game-container');
     requestFullscreen(container);
     canvas.width=screen.width
@@ -92,6 +100,7 @@ function turn_page(mnth){
     for(let x = 0; x < canvas.width; x+=cellW ){
     let temp = {x:x,y:y,date:0}
       if ( tick >= month[mnth].start && date<= month[mnth].end){
+        temp.month = mnth
         temp.date=date
         date++
       }
@@ -105,6 +114,14 @@ function draw_cells(){
     draw_set_color(0,0,0)
     draw_set_linewidth(1)
     draw_rectangle(cells[c].x, cells[c].y, cellW, cellH, 1, 0, 0, 0)
+    if(inside(mouse_x, mouse_y, cells[c].x, cells[c].y, cellW, cellH, 1, 0, 0, 0)){
+       if (inCell>120){
+    inCell = 0;
+         let label = cells[c].month+'/'+cells[c].date+'/2026'
+    console.log(label)
+        getFile()
+  }
+    }
     let now = new Date();
     let m = now.getMonth()
     let d = now.getDate()
@@ -146,6 +163,31 @@ function draw_gui(){
     }
   } 
   draw_centered_text(canvas.width/2, t+(cellH*0.4375), monthName[displayedMonth], 38, 700)
+}
+
+async function getFile() {
+    try {
+        // Opens the file picker
+        const [fileHandle] = await window.showOpenFilePicker({
+            types: [
+                {
+                    description: 'Images',
+                    accept: { 'image/*': ['.png', '.gif', '.jpeg', '.jpg'] }
+                },
+            ],
+            excludeAcceptAllOption: false,
+            multiple: false
+        });
+
+        // Get the file data
+        const file = await fileHandle.getFile();
+        
+        console.log("File Name:", file.name);
+        // Note: file.path will be undefined due to security
+        return file; 
+    } catch (err) {
+        console.error("User cancelled or error occurred:", err);
+    }
 }
 </script>
 <script type='text/javascript' src='engine.js'></script>
