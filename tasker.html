@@ -49,7 +49,9 @@ function start(){
   turn_page(displayedMonth)
 }
 function loop(){
-  
+  if(mouse_check_pressed()){
+    requestFullscreen(canvas)
+  }
   
 }
 function draw(){
