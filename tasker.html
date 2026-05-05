@@ -68,8 +68,8 @@ function loop(){
   if(mouse_check_pressed()){
     const container = document.getElementById('game-container');
     requestFullscreen(container);
-    canvas.width=screen.height
-    canvas.height=screen.height
+    canvas.width=screen.width
+    canvas.height=screen.width
     cellW = canvas.width/7
     cellH = canvas.height/7
     turn_page(displayedMonth)
@@ -137,8 +137,15 @@ function draw_gui(){
   }
   draw_rectangle(l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)
   draw_centered_text(l+(cellW*6.25), t+(cellH*0.4375), "NEXT", 22, 500)
-  
-  draw_centered_text(canvas.width/2, t+(cellH*0.4375), monthName[displayedMonth], 48, 700)
+   if(inside(mouse_x, mouse_y, l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)){
+    if(mouse_check_pressed()){
+      displayedMonth++
+      if(displayedMonth==12){
+        displayedMonth=0
+      }
+    }
+  } 
+  draw_centered_text(canvas.width/2, t+(cellH*0.4375), monthName[displayedMonth], 38, 700)
 }
 </script>
 <script type='text/javascript' src='engine.js'></script>
