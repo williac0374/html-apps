@@ -165,7 +165,7 @@ function draw_gui(){
   draw_centered_text(canvas.width/2, t+(cellH*0.4375), monthName[displayedMonth], 38, 700)
 }
 
-canvas.addEventListener('click', (e) => {
+canvas.addEventListener('pointerdown', (e) => {
   alert('Hello World!!'); // This will work because it's inside a click handler
 });
 
