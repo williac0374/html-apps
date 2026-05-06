@@ -1,177 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name='apple-mobile-web-app-capable' content='yes' />
-<meta name='viewport' content='initial-scale=1.0, maximum-scale=1.0, user-scalable=0, width=device-width, height=device-height' />
-<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
-<title>MAP</title>
-<style>
-/* CSS to disable scrolling and set fullscreen */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-}
-canvas {
-  border: 2px solid #000;
-  background-color: white;
-  display: block;
-  margin: 0 auto;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Calendar with Delete</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --accent-color: #4a90e2;
+            --border-color: #ddd;
+        }
 
-</style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calendar-container {
+            background: var(--card-bg);
+            width: 350px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .day-name {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #888;
+            padding-bottom: 10px;
+        }
+
+        .day {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            color: var(--text-color);
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .current-day {
+            border: 2px solid var(--accent-color);
+        }
+
+        .empty { visibility: hidden; }
+
+        .day-number {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            pointer-events: none;
+            font-weight: bold;
+            text-shadow: 0 0 4px white; 
+            color: #111;
+        }
+    </style>
 </head>
 <body>
-<div id="game-container" style="background: black; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-<canvas id="canvas" width="560" height="560"></canvas>
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <button class="nav-btn" id="prevMonth">&lt;</button>
+        <h2 id="monthDisplay">Month Year</h2>
+        <button class="nav-btn" id="nextMonth">&gt;</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+        <div class="day-name">Sun</div><div class="day-name">Mon</div>
+        <div class="day-name">Tue</div><div class="day-name">Wed</div>
+        <div class="day-name">Thu</div><div class="day-name">Fri</div>
+        <div class="day-name">Sat</div>
+    </div>
 </div>
 
+<input type="file" id="imageInput" accept="image/*" style="display: none;">
+
 <script>
-
-monthName=['January','February','March','April','May','June','July','August','September','Octorber','November','December']
-month = [
-{ name: 1 , start: 4 , end: 31 },
-{ name: 2 , start: 0 , end: 28 },
-{ name: 3 , start: 0 , end: 31 },
-{ name: 4 , start: 3 , end: 30 },
-{ name: 5 , start: 5 , end: 31 },
-{ name: 6 , start: 1 , end: 30 },
-{ name: 7 , start: 3 , end: 31 },
-{ name: 8 , start: 6 , end: 31 },
-{ name: 9 , start: 2 , end: 30 },
-{ name: 10 , start: 4 , end: 31 },
-{ name: 11 , start: 0 , end: 30 },
-{ name: 12 , start: 2 , end: 31 },
-]
-cells = []
-cellW = 80
-cellH = 80
-inCell = 0
-function start(){
-  draw_set_color(255,255,255)
-  setTimeout(function(){
-    canvas.width=screen.width
-    canvas.height=screen.height
-    cellW = canvas.width/7
-    cellH = canvas.height/7
-    let now = new Date();
-    displayedMonth = now.getMonth()
-    turn_page(displayedMonth)
-  },10)
-  
-  let now = new Date();
-  displayedMonth = now.getMonth()
-  turn_page(displayedMonth)
-}
-function loop(){
-  if(mouse_check()){
-    inCell++
-  }else{
-    inCell=0
-  }
-  
-  if(mouse_check_pressed()){
+    const monthDisplay = document.getElementById('monthDisplay');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const imageInput = document.getElementById('imageInput');
     
-    const container = document.getElementById('game-container');
-    requestFullscreen(container);
-    canvas.width=screen.width
-    canvas.height=screen.width
-    cellW = canvas.width/7
-    cellH = canvas.height/7
-    turn_page(displayedMonth)
-  }
-  document.title = mouse_x
-}
-function draw(){
-  draw_cells()
-  draw_gui()
-}
+    let currentDate = new Date();
+    let targetDateKey = null;
+    let pressTimer;
+    let db;
+    let currentObjectUrls = [];
 
-function turn_page(mnth){
-  if(cells.length>0){
-    cells = []
-  }
-  var date = 1
-  var tick = 0
-  document.title=monthName[mnth]
-  for(let y = 0; y < canvas.height-cellH-4; y+=cellH ){
-    for(let x = 0; x < canvas.width; x+=cellW ){
-    let temp = {x:x,y:y,date:0}
-      if ( tick >= month[mnth].start && date<= month[mnth].end){
-        temp.month = mnth
-        temp.date=date
-        date++
-      }
-      cells.push(temp)
-      tick++
-    }
-  }
-}
-function draw_cells(){
-  for(let c = 0;c < cells.length;c++){
-    draw_set_color(0,0,0)
-    draw_set_linewidth(1)
-    draw_rectangle(cells[c].x, cells[c].y, cellW, cellH, 1, 0, 0, 0)
-    if(inside(mouse_x, mouse_y, cells[c].x, cells[c].y, cellW, cellH, 1, 0, 0, 0)){
-      if (inCell>120){
-        inCell = 0;
-        let label = cells[c].month+'/'+cells[c].date+'/2026'
-        console.log(label)
-        
-      }
-    }
-    let now = new Date();
-    let m = now.getMonth()
-    let d = now.getDate()
-    if(cells[c].date == d && displayedMonth==m){
-      draw_set_color(0,255,0)
-      draw_set_linewidth(5)
-      draw_rectangle(cells[c].x+5, cells[c].y+5, cellW-10, cellH-10, 1, 0, 0, 0)
-    }
-    if(!cells[c].date==0){
-      draw_set_color(0,0,0)
-      draw_text(cells[c].x+2,cells[c].y+2,cells[c].date)
-    }
-    
-  }
-}
-function draw_gui(){
-  let l = 5
-  let t = cellH*6+5
-  draw_set_color(0,0,255)
-  draw_set_linewidth(3)
-  draw_rectangle(l, t, cellW*1.25, cellH-10, 1, 0, 0, 0)
-  draw_centered_text(l+(cellW*1.25)/2, t+(cellH*0.4375), "PREV", 22, 500)
-  if(inside(mouse_x, mouse_y, l, t, cellW*1.25, cellH-10, 1, 0, 0, 0)){
-    if(mouse_check_pressed()){
-      displayedMonth--
-      if(displayedMonth==-1){
-        displayedMonth=11
-      }
-    }
-  }
-  draw_rectangle(l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)
-  draw_centered_text(l+(cellW*6.25), t+(cellH*0.4375), "NEXT", 22, 500)
-  if(inside(mouse_x, mouse_y, l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)){
-    if(mouse_check_pressed()){
-      displayedMonth++
-      if(displayedMonth==12){
-        displayedMonth=0
-      }
-    }
-  }
-  draw_centered_text(canvas.width/2, t+(cellH*0.4375), monthName[displayedMonth], 38, 700)
-}
+    const request = indexedDB.open("CalendarPhotosDB", 1);
 
-canvas.addEventListener('pointerdown', (e) => {
-  alert('Hello World!!'); // This will work because it's inside a click handler
-});
+    request.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains("photos")) {
+            db.createObjectStore("photos");
+        }
+    };
 
+    request.onsuccess = (e) => {
+        db = e.target.result;
+        renderCalendar();
+    };
+
+    async function savePhoto(dateKey, blob) {
+        const tx = db.transaction("photos", "readwrite");
+        const store = tx.objectStore("photos");
+        store.put(blob, dateKey);
+        return tx.complete;
+    }
+
+    async function getPhoto(dateKey) {
+        return new Promise((resolve) => {
+            const tx = db.transaction("photos", "readonly");
+            const store = tx.objectStore("photos");
+            const request = store.get(dateKey);
+            request.onsuccess = () => resolve(request.result);
+        });
+    }
+
+    async function deletePhoto(dateKey) {
+        const tx = db.transaction("photos", "readwrite");
+        const store = tx.objectStore("photos");
+        store.delete(dateKey);
+        return tx.complete;
+    }
+
+    async function renderCalendar() {
+        currentObjectUrls.forEach(url => URL.revokeObjectURL(url));
+        currentObjectUrls = [];
+
+        const dayNames = document.querySelectorAll('.day-name');
+        calendarGrid.innerHTML = '';
+        dayNames.forEach(day => calendarGrid.appendChild(day));
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        monthDisplay.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const lastDay = new Date(year, month + 1, 0).getDate();
+
+        for (let x = 0; x < firstDayIndex; x++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.classList.add('day', 'empty');
+            calendarGrid.appendChild(emptyDiv);
+        }
+
+        const today = new Date();
+        for (let i = 1; i <= lastDay; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('day');
+            const dateKey = `${year}-${month + 1}-${i}`;
+
+            const numSpan = document.createElement('span');
+            numSpan.classList.add('day-number');
+            numSpan.textContent = i;
+            dayDiv.appendChild(numSpan);
+
+            const photoBlob = await getPhoto(dateKey);
+            if (photoBlob) {
+                const imageUrl = URL.createObjectURL(photoBlob);
+                currentObjectUrls.push(imageUrl);
+                dayDiv.style.backgroundImage = `url(${imageUrl})`;
+            }
+
+            if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayDiv.classList.add('current-day');
+            }
+
+            // Long Press Handlers (Add Image)
+            const startPress = () => {
+                pressTimer = setTimeout(() => {
+                    targetDateKey = dateKey;
+                    imageInput.click();
+                }, 600);
+            };
+            const cancelPress = () => clearTimeout(pressTimer);
+
+            // Double Tap Detection (Delete Image)
+            let lastClickTime = 0;
+            dayDiv.addEventListener('click', async () => {
+                const now = Date.now();
+                if (now - lastClickTime < 300) {
+                    cancelPress();
+                    if (confirm(`Delete image for ${dateKey}?`)) {
+                        await deletePhoto(dateKey);
+                        renderCalendar();
+                    }
+                }
+                lastClickTime = now;
+            });
+
+            dayDiv.addEventListener('mousedown', startPress);
+            dayDiv.addEventListener('mouseup', cancelPress);
+            dayDiv.addEventListener('touchstart', (e) => {
+                // Prevent scrolling/zoom while long-pressing
+                startPress();
+            }, { passive: true });
+            dayDiv.addEventListener('touchend', cancelPress);
+
+            calendarGrid.appendChild(dayDiv);
+        }
+    }
+
+    imageInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file && targetDateKey) {
+            await savePhoto(targetDateKey, file);
+            renderCalendar();
+        }
+    });
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
 </script>
-<script type='text/javascript' src='engine.js'></script>
+
 </body>
 </html>
-
-
