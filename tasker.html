@@ -71,7 +71,7 @@ function loop(){
   }else{
     inCell=0
   }
-
+  
   if(mouse_check_pressed()){
     
     const container = document.getElementById('game-container');
@@ -115,12 +115,12 @@ function draw_cells(){
     draw_set_linewidth(1)
     draw_rectangle(cells[c].x, cells[c].y, cellW, cellH, 1, 0, 0, 0)
     if(inside(mouse_x, mouse_y, cells[c].x, cells[c].y, cellW, cellH, 1, 0, 0, 0)){
-       if (inCell>120){
-    inCell = 0;
-         let label = cells[c].month+'/'+cells[c].date+'/2026'
-    console.log(label)
-        getFile()
-  }
+      if (inCell>120){
+        inCell = 0;
+        let label = cells[c].month+'/'+cells[c].date+'/2026'
+        console.log(label)
+        
+      }
     }
     let now = new Date();
     let m = now.getMonth()
@@ -154,41 +154,21 @@ function draw_gui(){
   }
   draw_rectangle(l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)
   draw_centered_text(l+(cellW*6.25), t+(cellH*0.4375), "NEXT", 22, 500)
-   if(inside(mouse_x, mouse_y, l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)){
+  if(inside(mouse_x, mouse_y, l+(cellW*5.625), t, cellW*1.25, cellH-10, 1, 0, 0, 0)){
     if(mouse_check_pressed()){
       displayedMonth++
       if(displayedMonth==12){
         displayedMonth=0
       }
     }
-  } 
+  }
   draw_centered_text(canvas.width/2, t+(cellH*0.4375), monthName[displayedMonth], 38, 700)
 }
 
-async function getFile() {
-    try {
-        // Opens the file picker
-        const [fileHandle] = await window.showOpenFilePicker({
-            types: [
-                {
-                    description: 'Images',
-                    accept: { 'image/*': ['.png', '.gif', '.jpeg', '.jpg'] }
-                },
-            ],
-            excludeAcceptAllOption: false,
-            multiple: false
-        });
+canvas.addEventListener('click', (e) => {
+  alert('Hello World!!'); // This will work because it's inside a click handler
+});
 
-        // Get the file data
-        const file = await fileHandle.getFile();
-        
-        console.log("File Name:", file.name);
-        // Note: file.path will be undefined due to security
-        return file; 
-    } catch (err) {
-        console.error("User cancelled or error occurred:", err);
-    }
-}
 </script>
 <script type='text/javascript' src='engine.js'></script>
 </body>
