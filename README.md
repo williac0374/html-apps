@@ -11,3 +11,5 @@ https://williac0374.github.io/html-apps/gameEngine.html
 https://williac0374.github.io/html-apps/index.html
 <br><br>
 https://williac0374.github.io/html-apps/tasker.html
+<br><br>
+https://williac0374.github.io/html-apps/slowDraw.html
