@@ -1,7 +1,7 @@
 {
-  "name": "yatzee scoreboard",
-  "short_name": "yatzee scoreboard",
-  "description": "Github Page as a Progressive Web App",
+  "name": "personal punchcards",
+  "short_name": "personal punchcards",
+  "description": "productivity aap",
   "scope": "/html-apps/",
   "start_url": "/html-apps/",
   "background_color": "#ffffff",
@@ -9,8 +9,8 @@
   "display": "fullscreen", 
   "icons": [
       {
-        "src": "/html-apps/yicon.png",
-        "type": "image/png",
+        "src": "/html-apps/yicon.svg",
+        "type": "image/svg+xml",
         "sizes": "512x512"
       }
   ]
