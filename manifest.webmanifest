@@ -3,7 +3,7 @@
   "short_name": "personal punchcards",
   "description": "productivity aap",
   "scope": "/html-apps/",
-  "start_url": "/html-apps/",
+  "start_url": "/html-apps/index.html",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "display": "fullscreen", 
