@@ -1,7 +1,7 @@
 {
   "name": "SlowDraw",
   "short_name": "SlowDraw",
-  "start_url": "./slowDraw.html",
+  "start_url": "./personal_punchCards.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
