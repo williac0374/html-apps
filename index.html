@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Personal Punch Cards</title>
-  <link rel="canonical" href="https://williac0374.github.io/html-apps/" />
-  <link rel="manifest" href="/html-apps/manifest.webmanifest">
   <meta name="theme-color" content="#fef8e7" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   
-  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlBlcnNvbmFsIFB1bmNoIENhcmRzIiwKICAic2hvcnRfbmFtZSI6ICJQdW5jaENhcmRzIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZmVmOGU3IiwKICAidGhlbWVfY29sb3IiOiAiI2ZlZjhlNyIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDt1dGY4LDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMTAwIDEwMCc+PHJlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIGZpbGw9JyNmZWY4ZTcnLz48dGV4dCB5PScuOWVtJyBmb250LXNpemU9JzkwJz7wn42nPC90ZXh0Pjwvc3ZnPiIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=" />
+  <link rel="manifest" href="manifest.webmanifest" />
 
   <style>
     :root {
@@ -179,7 +177,7 @@
   <div class="card-header">
     <input type="date" id="datePicker" class="date-selector" onchange="changeDate(this.value)" />
     <div class="header-right">
-      <button id="todayBtn" class="today-btn" onclick="jumpToToday()">Today</button>
+      <button id="todayBtn" class="today-btn" onclick="jumpToToday()">Jump to Today</button>
       <span class="star-badge" id="starBadge">⭐</span>
     </div>
   </div>
@@ -226,11 +224,8 @@
     selectedKey = dateKey;
     document.getElementById('datePicker').value = selectedKey;
     
+    // Show 'Jump to Today' button whenever selected date is not today
     document.getElementById('todayBtn').style.display = (selectedKey === todayKey) ? 'none' : 'block';
-    const isToday = (selectedKey === todayKey);
-    document.getElementById('workForm').style.display = isToday ? 'block' : 'none';
-    document.getElementById('personalForm').style.display = isToday ? 'block' : 'none';
-    document.getElementById('notesArea').readOnly = !isToday;
 
     const stored = localStorage.getItem(`punchcard_${selectedKey}`);
     cardData = stored ? JSON.parse(stored) : { work: [], personal: [], notes: "" };
@@ -253,8 +248,6 @@
 
   function addTask(e, category) {
     e.preventDefault();
-    if (selectedKey !== todayKey) return;
-
     const input = document.getElementById(`${category}Input`);
     const val = input.value.trim();
     if (!val) return;
@@ -265,23 +258,19 @@
   }
 
   function toggleTask(category, index) {
-    if (selectedKey !== todayKey) return;
     cardData[category][index].completed = !cardData[category][index].completed;
     save();
   }
 
   function editTask(category, index) {
-    if (selectedKey !== todayKey) return;
     const currentText = cardData[category][index].text;
     const updatedText = prompt("Edit task (leave blank to delete):", currentText);
     
     if (updatedText !== null) {
       const trimmed = updatedText.trim();
       if (trimmed === "") {
-        // Delete task if string is empty
         cardData[category].splice(index, 1);
       } else {
-        // Update task name
         cardData[category][index].text = trimmed;
       }
       save();
@@ -297,7 +286,6 @@
   }
 
   function saveNotes() {
-    if (selectedKey !== todayKey) return;
     cardData.notes = document.getElementById('notesArea').value;
     localStorage.setItem(`punchcard_${selectedKey}`, JSON.stringify(cardData));
   }
@@ -311,7 +299,7 @@
       timer = setTimeout(() => {
         isLongPress = true;
         editTask(category, index);
-      }, 500); // Hold for 500ms to edit/delete
+      }, 500);
     };
 
     const clear = () => {
@@ -321,7 +309,7 @@
     element.onpointerdown = start;
     element.onpointerup = () => {
       clear();
-      if (!isLongPress && selectedKey === todayKey) {
+      if (!isLongPress) {
         toggleTask(category, index);
       }
     };
@@ -351,9 +339,10 @@
         leftDiv.appendChild(label);
         div.appendChild(leftDiv);
 
-        if (selectedKey === todayKey) {
-          attachLongPress(leftDiv, cat, idx);
-        } else if (!task.completed) {
+        attachLongPress(leftDiv, cat, idx);
+
+        // Show copy button if viewing a past date card with incomplete tasks
+        if (selectedKey < todayKey && !task.completed) {
           const copyBtn = document.createElement('button');
           copyBtn.className = 'copy-btn';
           copyBtn.innerText = '+ Today';
@@ -391,7 +380,7 @@
 
   if ('serviceWorker' in navigator) {
     const swCode = `
-      self.addEventListener('install', e => e.waitUntil(caches.open('pwa-v5').then(c => c.add('./'))));
+      self.addEventListener('install', e => e.waitUntil(caches.open('pwa-v6').then(c => c.add('./'))));
       self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
     `;
     const blob = new Blob([swCode], { type: 'application/javascript' });
