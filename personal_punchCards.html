@@ -379,13 +379,8 @@
   }
 
   if ('serviceWorker' in navigator) {
-    const swCode = `
-      self.addEventListener('install', e => e.waitUntil(caches.open('pwa-v6').then(c => c.add('./'))));
-      self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
-    `;
-    const blob = new Blob([swCode], { type: 'application/javascript' });
-    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-  }
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
 
   loadCard(todayKey);
 </script>
