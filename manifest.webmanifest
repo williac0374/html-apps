@@ -6,7 +6,7 @@
   "start_url": "/html-apps/index.html",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
-  "display": "fullscreen", 
+  "display": "standalone", 
   "icons": [
       {
         "src": "/html-apps/yicon.svg",
