@@ -1,5 +1,5 @@
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open('pwa-v8').then(c => c.add('./')));
+  e.waitUntil(caches.open('pwa-v9').then(c => c.add('./')));
 });
 
 self.addEventListener('fetch', e => {
