@@ -231,10 +231,14 @@
 </div>
 
 <script>
-  const getTodayKey = () => new Date().toISOString().split('T')[0];
-  let todayKey = getTodayKey();
-  let selectedKey = todayKey;
-  let cardData = { work: [], personal: [], notes: "" };
+  // Replace the existing getTodayKey function in your <script> tag with this:
+const getTodayKey = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
   function loadCard(dateKey) {
     selectedKey = dateKey;
